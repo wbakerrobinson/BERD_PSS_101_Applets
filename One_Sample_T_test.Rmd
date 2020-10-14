@@ -46,6 +46,7 @@ alpha <- 0.05
 mu0 <- 0
 muA <- 1 
 sd <- 2
+pop_sd <- FALSE
 effect_size <- abs(mu0 - muA)/sd
 power <- NA
 N <- 50
@@ -64,7 +65,7 @@ data <- tibble(x_val = seq(from = -3.5*(df/(df-2)),
 max_h0 <- max(data$pdf_h0)
 
 # 1 sample T test power plot w/ sample size given
-ggplot(data) +
+ggplot(data) + 
   geom_area(mapping = aes(y = ifelse(x_val < -test_stat | x_val > test_stat, pdf_h0, 0), 
                           x= x_val, 
                           fill = "Type I Error (alpha)")) +
@@ -110,7 +111,7 @@ ggplot(data) +
   annotate("text", x = -test_stat, y = max_h0 + 0.01, label = glue("-Tcrit")) +
   annotate("text", x = test_stat, y = max_h0 + 0.01, label = glue("+Tcrit")) +
   theme_bw() + # will create my own theme eventually
-  scale_fill_manual(name = "Area Represents:", values = c("#CCCCCC", "#0072B2", "#E69F00", "#F0E442")) +
+  scale_fill_manual(name = "Area Represents:", values = c("#0072B2", "#CCCCCC", "#E69F00", "#F0E442")) +
   theme(legend.position="bottom")
 ```
 
