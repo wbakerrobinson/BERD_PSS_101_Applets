@@ -44,11 +44,11 @@ $n \in \{1,...\}$
 # Parameters
 alpha <- 0.05
 mu0 <- 0
-muA <- 0.5 
-sd <- 1
+muA <- 1 
+sd <- 2
 effect_size <- abs(mu0 - muA)/sd
 power <- NA
-N <- 25
+N <- 50
 df <- N-1
 two_sided = TRUE # default
 test_stat <- calc_test_stat(df, alpha, two_sided)
@@ -60,7 +60,7 @@ data <- tibble(x_val = seq(from = -3.5*(df/(df-2)),
                pdf_hA = dt(x_val, df, ncp)) %>%
    filter(!(x_val < 0 & pdf_h0 < 0.001) & !(x_val > ncp & pdf_hA < 0.001)) # will maybe make slightly more efficient?
 
-# seems more efficient to call once and store here than call continuously in the ggplot fx
+# max of pdf_h0 stored here so I don't call it 3x in ggplot fx
 max_h0 <- max(data$pdf_h0)
 
 # 1 sample T test power plot w/ sample size given
@@ -68,7 +68,9 @@ ggplot(data) +
   geom_area(mapping = aes(y = ifelse(x_val < -test_stat | x_val > test_stat, pdf_h0, 0), 
                           x= x_val, 
                           fill = "Type I Error (alpha)")) +
-  geom_area(mapping = aes(y = ifelse(x_val < test_stat, pdf_hA, 0), x= x_val, fill = "Type II Error (Beta)")) +
+  geom_area(mapping = aes(y = ifelse(x_val < test_stat, pdf_hA, 0), 
+                          x= x_val, 
+                          fill = "Type II Error (Beta)")) +
   geom_ribbon(data %>% filter(x_val <= test_stat & x_val >= -test_stat), 
               mapping = aes(ymax = ifelse(pdf_h0 < pdf_hA, pdf_hA, pdf_h0), 
                             ymin = pdf_hA, 
@@ -78,12 +80,12 @@ ggplot(data) +
               mapping = aes(ymin = pdf_h0, 
                             ymax = ifelse(pdf_hA < pdf_h0, pdf_h0, pdf_hA), 
                             x = x_val, 
-                            fill = "True Positive (Power)")) +
+                            fill = "Power")) +
   geom_ribbon(data %>% filter(x_val <= -test_stat), 
               mapping = aes(ymin = 0, 
                   ymax = pdf_hA, 
                   x = x_val, 
-                  fill = "True Positive (Power)")) +
+                  fill = "Power")) +
   geom_line(data %>% filter(!(pdf_h0 < 0.001 & x_val > 0)),
             mapping = aes(x = x_val,
                           y = pdf_h0),
@@ -93,11 +95,13 @@ ggplot(data) +
                    y = 0, 
                    xend = -test_stat, 
                    yend = max_h0),
-               alpha = 0.7) + 
+               alpha = 0.7,
+               color = "#999999") + 
   geom_segment(aes(x = test_stat, 
                    y = 0, xend = test_stat, 
                    yend = max_h0), 
-               alpha = 0.7) + 
+               alpha = 0.7,
+               color = "#999999") + 
   labs(y = "Value of Probability Density Function",
        x = "Value of T statistic",
        title = "Traditional Power Visualization: 1 Sample T-test") +
@@ -106,7 +110,7 @@ ggplot(data) +
   annotate("text", x = -test_stat, y = max_h0 + 0.01, label = glue("-Tcrit")) +
   annotate("text", x = test_stat, y = max_h0 + 0.01, label = glue("+Tcrit")) +
   theme_bw() + # will create my own theme eventually
-  scale_fill_manual(name = "Area Represents:", values = c("#CCCCCC", "#0072B2", "#009E73", "#F0E442")) +
+  scale_fill_manual(name = "Area Represents:", values = c("#CCCCCC", "#0072B2", "#E69F00", "#F0E442")) +
   theme(legend.position="bottom")
 ```
 
@@ -120,6 +124,7 @@ sd <- 1
 effect_size <- abs(mu0 - muA)/sd
 power <- 0.80
 N <- NA
+# solve for N & df then more or less same plot as above
 ```
 
 
