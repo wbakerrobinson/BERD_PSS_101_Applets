@@ -28,7 +28,6 @@ source("functions.r")
 ```
 
 Hypotheses: $H_0: \mu_0 = \mu_A$ vs. $H_A: \mu_0 \ne \mu_A$  
-`Do I want to try to include the one-sided hypotheses?`  
 Alpha: This will be a variable that the user can set but default to 0.05   
 $\mu_0:$ Population mean under the null hypothesis.  
 $\mu_A:$ Anticipated population mean under the alternative hypothesis.  
@@ -54,15 +53,15 @@ df <- N-1
 two_sided = TRUE # default
 test_stat <- calc_test_stat(df, alpha, two_sided)
 ncp <- (muA - mu0) * sqrt(N)/sd
-data <- tibble(x_val = seq(from = -3.5*sd, 
-                           to = ncp + ifelse(ncp > 3.5, ncp + 1, 3.5)*sd, 
+data <- tibble(x_val = seq(from = -3.5*(df/(df-2)), 
+                           to = ncp + ifelse(ncp > 4, ncp + 1, 3.5)*(df/(df-2)), 
                            by = 0.01),
                pdf_h0 = dt(x_val, df),
                pdf_hA = dt(x_val, df, ncp)) %>%
    filter(!(x_val < 0 & pdf_h0 < 0.001) & !(x_val > ncp & pdf_hA < 0.001)) # will maybe make slightly more efficient?
-5
+
 # seems more efficient to call once and store here than call continuously in the ggplot fx
-max_hA <- max(data$pdf_hA)
+max_h0 <- max(data$pdf_h0)
 
 # 1 sample T test power plot w/ sample size given
 ggplot(data) +
@@ -85,30 +84,32 @@ ggplot(data) +
                   ymax = pdf_hA, 
                   x = x_val, 
                   fill = "True Positive (Power)")) +
+  geom_line(data %>% filter(!(pdf_h0 < 0.001 & x_val > 0)),
+            mapping = aes(x = x_val,
+                          y = pdf_h0),
+            color = "#999999",
+            lty = "dashed") +
   geom_segment(aes(x = -test_stat, 
                    y = 0, 
                    xend = -test_stat, 
-                   yend = max_hA + 0.03),
+                   yend = max_h0),
                alpha = 0.7) + 
   geom_segment(aes(x = test_stat, 
                    y = 0, xend = test_stat, 
-                   yend = max_hA + 0.03), 
+                   yend = max_h0), 
                alpha = 0.7) + 
   labs(y = "Value of Probability Density Function",
        x = "Value of T statistic",
-       title = "Traditional Power Visualization - 1 Sample T-test") +
+       title = "Traditional Power Visualization: 1 Sample T-test") +
   annotate("text", x = 0, y = max(data$pdf_h0) + 0.01, label = glue("H0")) +
-  annotate("text", x = data[[which.max(data$pdf_hA),1]], y = max_hA + 0.01, label = glue("HA")) +
-  annotate("text", x = -test_stat, y = max_hA + 0.04, label = glue("-Tcrit")) +
-  annotate("text", x = test_stat, y = max_hA + 0.04, label = glue("+Tcrit")) +
+  annotate("text", x = data[[which.max(data$pdf_hA),1]], y = max(data$pdf_hA) + 0.01, label = glue("HA")) +
+  annotate("text", x = -test_stat, y = max_h0 + 0.01, label = glue("-Tcrit")) +
+  annotate("text", x = test_stat, y = max_h0 + 0.01, label = glue("+Tcrit")) +
   theme_bw() + # will create my own theme eventually
-  scale_fill_viridis_d(name = "Area Represents:") +
+  scale_fill_manual(name = "Area Represents:", values = c("#CCCCCC", "#0072B2", "#009E73", "#F0E442")) +
   theme(legend.position="bottom")
 ```
 
-```{r graph calc power}
-
-```
 
 ```{r Calc N}
 # Parameters
@@ -121,9 +122,6 @@ power <- 0.80
 N <- NA
 ```
 
-```{r graph calc n}
-
-```
 
 ```{r power graph}
 
