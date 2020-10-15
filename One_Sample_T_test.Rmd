@@ -118,14 +118,14 @@ ggplot(data) +
 
 ```{r Calc N}
 # Parameters
-alpha <- 0.05
-mu0 <- 0
-muA <- 1
-sd <- 1
-effect_size <- abs(mu0 - muA)/sd
-power <- 0.80
-N <- NA
-# solve for N & df then more or less same plot as above
+# alpha <- 0.05
+# mu0 <- 0
+# muA <- 1
+# sd <- 1
+# effect_size <- abs(mu0 - muA)/sd
+# power <- 0.80
+# N <- NA
+# # solve for N & df then more or less same plot as above
 ```
 
 
@@ -159,10 +159,10 @@ power_data <- power_data %>%
   mutate(alpha_level = factor(alpha_level),
          user_alpha = ifelse(alpha == alpha_level, TRUE, FALSE))
 
-power_data_non_user <- power_data %>%
-  filter(alpha != alpha_level)
-power_data_user <- power_data %>%
-  filter(alpha != alpha_level)
+# power_data_non_user <- power_data %>%
+#   filter(alpha != alpha_level)
+# power_data_user <- power_data %>%
+#   filter(alpha != alpha_level)
 
 ggplot() +
    geom_segment(aes(x = user_N,
