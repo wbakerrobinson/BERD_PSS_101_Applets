@@ -161,8 +161,13 @@ power_data <- power_data %>%
 
 power_data_non_user <- power_data %>%
   filter(alpha != alpha_level)
+
 power_data_user <- power_data %>%
   filter(alpha == alpha_level)
+
+label_non_user <- power_data_non_user %>%
+  group_by(alpha_level) %>%
+  summarize(max = max(power))
 
 ggplot() +
    geom_segment(aes(x = user_N,
@@ -186,11 +191,14 @@ ggplot() +
   geom_point(power_data_user, mapping = aes(x = N, y = power), shape = 17, color = "#0072B2") +
   geom_line(power_data_user, mapping = aes(x = N, y = power), color = "#0072B2") +
   geom_point(power_data, mapping = aes(x = user_N, y = user_power), color = "#D55E00", shape = 17) +
+  geom_text(label_non_user, mapping = aes(x = user_N + 6.5, y = max, label = alpha_level, color = alpha_level)) +
+  geom_text(power_data_user, mapping = aes(x = user_N + 6.5, y = max(power), label = alpha_level), color = "#0072B2") +
   theme_bw() +
   labs(x = "Sample Size",
        y = "Power",
-       title = "Power Curve: 1 sample T-test") +
-  theme(legend.position="bottom") +
+       title = "Power Curve: 1 sample T-test by alpha level",
+       subtitle = "User specified alpha in blue with (N, power) in red") +
+  theme(legend.position="none") +
   scale_color_grey()
 ```
 
