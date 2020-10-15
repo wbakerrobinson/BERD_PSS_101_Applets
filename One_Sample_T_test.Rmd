@@ -129,7 +129,64 @@ N <- NA
 ```
 
 
-```{r power graph}
+```{r power graph with dif alpha levels}
+pow_2_side <- ifelse(two_sided, 1, 2)
+alternative <- c("two.sided", "one.sided")
+alpha_presets <- c(0.01, 0.05, 0.10)
+alpha <- 0.25
+user_power <- power.t.test(N, abs(mu0-muA), sd, sig.level = alpha, alternative = alternative[pow_2_side])[["power"]]
+user_N <- N
+if(alpha %in% alpha_presets)
+  {
+  power_data <- tibble(N = seq(5, N + 5, 1),
+                       alpha0.01 = power.t.test(N, abs(mu0-muA), sd, sig.level = 0.01, alternative = alternative[pow_2_side])[["power"]],
+                       alpha0.05 = power.t.test(N, abs(mu0-muA), sd, sig.level = 0.05, alternative = alternative[pow_2_side])[["power"]],
+                       alpha0.10 = power.t.test(N, abs(mu0-muA), sd, sig.level = 0.10, alternative = alternative[pow_2_side])[["power"]])
+  } else
+    {
+      power_data <- tibble(N = seq(5, N + 5, 1),
+                       alpha0.01 = power.t.test(N, abs(mu0-muA), sd, sig.level = 0.01, alternative = alternative[pow_2_side])[["power"]],
+                       alpha0.05 = power.t.test(N, abs(mu0-muA), sd, sig.level = 0.05, alternative = alternative[pow_2_side])[["power"]],
+                       alpha0.10 = power.t.test(N, abs(mu0-muA), sd, sig.level = 0.10, alternative = alternative[pow_2_side])[["power"]],
+                       user_alpha = power.t.test(N, abs(mu0-muA), sd, sig.level = alpha, alternative = alternative[pow_2_side])[["power"]]) %>%
+      rename(!!paste0("alpha", alpha) := user_alpha)
+    }
+power_data <- power_data %>%
+  pivot_longer(starts_with("alpha"),
+               names_prefix = "alpha",
+               values_to = "power",
+               names_to = "alpha_level") %>%
+  mutate(alpha_level = factor(alpha_level),
+         user_alpha = ifelse(alpha == alpha_level, TRUE, FALSE))
 
+power_data_non_user <- power_data %>%
+  filter(alpha != alpha_level)
+power_data_user <- power_data %>%
+  filter(alpha != alpha_level)
+
+ggplot() +
+   geom_segment(aes(x = user_N,
+                   y = 0,
+                   xend = user_N,
+                   yend = user_power),
+               alpha = 0.5,
+               color = "#999999",
+               lty = "dashed") + # change color
+  geom_segment(aes(x = 0,
+                   y = user_power,
+                   xend = user_N,
+                   yend = user_power),
+               alpha = 0.5,
+               color = "#999999",
+               lty = "dashed") + # change color
+  geom_point(power_data, mapping = aes(x = N, y = power, shape = user_alpha, color = alpha_level)) +
+  geom_line(power_data, mapping = aes(x = N, y = power, group = alpha_level, color = alpha_level)) +
+  geom_point(power_data, mapping = aes(x = user_N, y = user_power), color = "red", shape = 17) +
+  theme_bw() +
+  labs(x = "Sample Size",
+       y = "Power",
+       title = "Power Curve: 1 sample T-test") +
+  theme(legend.position="bottom") +
+  scale_color_manual(name = "Alpha level:", values = c("#0072B2", "#CCCCCC", "#E69F00", "#F0E442"))
 ```
 
