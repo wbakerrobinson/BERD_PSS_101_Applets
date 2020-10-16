@@ -40,7 +40,9 @@ $S \in (0,1)$
 Sample size: # of participants required to attain a certain power.  
 $n \in \{1,...\}$  
 
-```{r Calc power}
+# Hypothesis Distribution Graphs
+
+```{r distribution n & mu0 / muA or dif given}
 # Parameters
 alpha <- 0.05
 mu0 <- 0
@@ -116,7 +118,7 @@ ggplot(data) +
 ```
 
 
-```{r Calc N}
+```{r distribution power & mu0/ muA or dif given}
 # Parameters
 # alpha <- 0.05
 # mu0 <- 0
@@ -128,12 +130,13 @@ ggplot(data) +
 # # solve for N & df then more or less same plot as above
 ```
 
+# Power Graphs
 
 ```{r power graph with dif alpha levels}
 pow_2_side <- ifelse(two_sided, 1, 2)
 alternative <- c("two.sided", "one.sided")
 alpha_presets <- c(0.01, 0.05, 0.10)
-alpha <- 0.50
+alpha <- 0.05
 user_power <- power.t.test(N, abs(mu0-muA), sd, sig.level = alpha, alternative = alternative[pow_2_side])[["power"]]
 user_N <- N
 if(alpha %in% alpha_presets)
@@ -156,6 +159,7 @@ power_data <- power_data %>%
                names_prefix = "alpha",
                values_to = "power",
                names_to = "alpha_level") %>%
+  # Maybe remove user_alpha? RN just an extra var. May use in future if I want to add a legend for shape.
   mutate(alpha_level = factor(alpha_level),
          user_alpha = ifelse(alpha == alpha_level, TRUE, FALSE))
 
@@ -175,29 +179,106 @@ ggplot() +
                    xend = user_N,
                    yend = user_power),
                alpha = 0.5,
-               color = "#D55E00",
-               lty = "dashed") + # change color
+               color = "#0072B2",
+               lty = "dashed") + 
   geom_segment(aes(x = 0,
                    y = user_power,
                    xend = user_N,
                    yend = user_power),
                alpha = 0.5,
-               color = "#D55E00",
-               lty = "dashed") + # change color
+               color = "#0072B2",
+               lty = "dashed") + 
   # Color for non-user entered
   geom_point(power_data_non_user, mapping = aes(x = N, y = power, color = alpha_level), shape = 16) +
   geom_line(power_data_non_user, mapping = aes(x = N, y = power, group = alpha_level, color = alpha_level)) +
   # Color for user entered
-  geom_point(power_data_user, mapping = aes(x = N, y = power), shape = 17, color = "#0072B2") +
-  geom_line(power_data_user, mapping = aes(x = N, y = power), color = "#0072B2") +
-  geom_point(power_data, mapping = aes(x = user_N, y = user_power), color = "#D55E00", shape = 17) +
+  geom_point(power_data_user, mapping = aes(x = N, y = power), shape = 17, color = "#E69F00") +
+  geom_line(power_data_user, mapping = aes(x = N, y = power), color = "#E69F00") +
+  geom_point(power_data, mapping = aes(x = user_N, y = user_power), color = "#0072B2", shape = 17) +
   geom_text(label_non_user, mapping = aes(x = user_N + 6.5, y = max, label = alpha_level, color = alpha_level)) +
-  geom_text(power_data_user, mapping = aes(x = user_N + 6.5, y = max(power), label = alpha_level), color = "#0072B2") +
+  geom_text(power_data_user, mapping = aes(x = user_N + 6.5, y = max(power), label = alpha_level), color = "#E69F00") +
   theme_bw() +
   labs(x = "Sample Size",
        y = "Power",
        title = "Power Curve: 1 sample T-test by alpha level",
-       subtitle = "User specified alpha in blue with (N, power) in red") +
+       subtitle = "User specified alpha in orange with (N, power) in blue") +
+  theme(legend.position="none") +
+  scale_color_grey()
+```
+
+```{r power graph with dif effect sizes}
+pow_2_side <- ifelse(two_sided, 1, 2)
+alternative <- c("two.sided", "one.sided")
+std_effect <- c(0.2, 0.5, 0.8)
+delta_vals <- std_effect*sd
+alpha <- 0.05
+delta <- abs(mu0-muA)
+user_power <- power.t.test(N, user_delta, sd, sig.level = alpha, alternative = alternative[pow_2_side])[["power"]]
+user_N <- N
+if(delta %in% delta_vals)
+  {
+  power_data <- tibble(N = seq(5, N + 5, 1),
+                       !!paste0("delta", delta_vals[1]) := power.t.test(N, delta_vals[1], sd, sig.level = alpha, alternative = alternative[pow_2_side])[["power"]],
+                       !!paste0("delta", delta_vals[2]) := power.t.test(N, delta_vals[2], sd, sig.level = alpha, alternative = alternative[pow_2_side])[["power"]],
+                       !!paste0("delta", delta_vals[3]) := power.t.test(N, delta_vals[3], sd, sig.level = alpha, alternative = alternative[pow_2_side])[["power"]])
+  } else
+    {
+      power_data <- tibble(N = seq(5, N + 5, 1),
+                       !!paste0("delta", delta_vals[1]) := power.t.test(N, delta_vals[1], sd, sig.level = alpha, alternative = alternative[pow_2_side])[["power"]],
+                       !!paste0("delta", delta_vals[2]) := power.t.test(N, delta_vals[2], sd, sig.level = alpha, alternative = alternative[pow_2_side])[["power"]],
+                       !!paste0("delta", delta_vals[3]) := power.t.test(N, delta_vals[3], sd, sig.level = alpha, alternative = alternative[pow_2_side])[["power"]],
+                       user_delta = power.t.test(N, delta, sd, sig.level = alpha, alternative = alternative[pow_2_side])[["power"]]) %>%
+      rename(!!paste0("delta", delta) := user_delta)
+    }
+power_data <- power_data %>%
+  pivot_longer(starts_with("delta"),
+               names_prefix = "delta",
+               names_transform = list("delta_val" = as.double),
+               values_to = "power",
+               names_to = "delta_val") %>%
+  mutate(effect = factor(delta_val/sd))
+
+power_data_non_user <- power_data %>%
+  filter(delta != delta_val) %>%
+  select(-delta_val)
+
+power_data_user <- power_data %>%
+  filter(delta == delta_val) %>%
+  select(-delta_val)
+
+label_non_user <- power_data_non_user %>%
+  group_by(effect) %>%
+  summarize(max = max(power))
+
+ggplot() +
+   geom_segment(aes(x = user_N,
+                   y = 0,
+                   xend = user_N,
+                   yend = user_power),
+               alpha = 0.5,
+               color = "#0072B2",
+               lty = "dashed") + 
+  geom_segment(aes(x = 0,
+                   y = user_power,
+                   xend = user_N,
+                   yend = user_power),
+               alpha = 0.5,
+               color = "#0072B2",
+               lty = "dashed") + 
+  # Color for non-user entered
+  geom_point(power_data_non_user, mapping = aes(x = N, y = power, color = effect), shape = 16) +
+  geom_line(power_data_non_user, mapping = aes(x = N, y = power, group = effect, color = effect)) +
+  # Color for user entered
+  geom_point(power_data_user, mapping = aes(x = N, y = power), shape = 17, color = "#E69F00") +
+  geom_line(power_data_user, mapping = aes(x = N, y = power), color = "#E69F00") +
+  geom_point(power_data, mapping = aes(x = user_N, y = user_power), color = "#0072B2", shape = 17) +
+  geom_text(label_non_user, mapping = aes(x = user_N + 6.5, y = max, label = effect, color = effect)) +
+  geom_text(power_data_user, mapping = aes(x = user_N + 6.5, y = max(power), label = effect), color = "#E69F00") +
+  theme_bw() +
+  labs(x = "Sample Size",
+       y = "Power",
+       title = "Power Curve: 1 sample T-test by effect size",
+       subtitle = "User specified effect size in orange with (N, power) in blue") +
   theme(legend.position="none") +
   scale_color_grey()
 ```
