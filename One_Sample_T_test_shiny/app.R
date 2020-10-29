@@ -84,17 +84,21 @@ ui <- fluidPage(
                              max = 0.10,
                              value = 0.05,
                              step = 0.01),
-                 hr(),
-                 radioButtons("pow_curve",
-                              "Stratify Power curve by:",
-                              choices = list("Alpha" = 2,
-                                             "Effect Size" = 1),
-                              inline = TRUE,
-                              selected = 2)),
+                 conditionalPanel(condition = "input.main_tab == 'Power Curve'",
+                                  hr(),
+                                  h4(helpText("Power Curve Options")),
+                                  radioButtons("pow_curve",
+                                               "Stratify Power curve by:",
+                                               choices = list("Alpha" = 2,
+                                                              "Effect Size" = 1),
+                                               inline = TRUE,
+                                               selected = 2))),
+
     # Plots and maybe power etc. Want to tab set?
     mainPanel(
         h3(htmlOutput("header")),
-        tabsetPanel(type = "tabs",
+        tabsetPanel(id = "main_tab",
+                    type = "tabs",
                     tabPanel("Power Visualization", plotOutput("power_viz", width = "100%")),
                     tabPanel("Power Curve", plotOutput("pow_curve"), width = "100%"),
                     selected = "Power Visualization")
@@ -153,12 +157,21 @@ server <- function(input, output, session) {
             crit_val <- qnorm(1 - input$alpha/two_sided, mean = input$mu0, sd = input$sd/sqrt(N))
             crit_output <- sprintf("Z Critical Value: %s %s", ifelse(two_sided == 2, "-/+", ''), round(crit_val, 3))
         }
+        
         # return vars
         distribution <- paste('Distribution:', ifelse(input$sd_known == FALSE, 'Student\'s t', 'Normal'))
         effect_size <- paste("Effect Size:", round(user_effect, 3))
         power_output <- paste("Power:", round(power, 3))
         N_output <- paste("Sample Size:", ceiling(N))
-        return_HTML <- HTML(paste(distribution, crit_output, effect_size, power_output, N_output, sep = '<br/>'))
+        
+        # Add DF if T distr
+        if(input$sd_known == FALSE)
+        {
+            df <- paste("Degrees of Freedom:", N - 1)
+            return_HTML <- HTML(paste(distribution, df, crit_output, effect_size, power_output, N_output, sep = '<br/>'))
+        }else{
+            return_HTML <- HTML(paste(distribution, crit_output, effect_size, power_output, N_output, sep = '<br/>'))
+        }
         return(return_HTML)
     })
 
