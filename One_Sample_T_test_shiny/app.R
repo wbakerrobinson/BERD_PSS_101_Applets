@@ -256,7 +256,7 @@ server <- function(input, output, session) {
                 }
             }
         }
-    }, height = 695)
+    }, height = 655)
 
     #Power curve
     output$pow_curve <- renderPlot({
@@ -286,7 +286,17 @@ server <- function(input, output, session) {
                                       power = input$power,
                                       alternative = alternative[[two_sided]])[["n"]])
             N <- ceiling(N)
-            power <- input$power
+            # power <- input$power
+            # Really janky but without sequencing by power instead of N the points don't plot correctly
+            power <- ifelse(input$sd_known == FALSE,
+                            pwr.t.test(n = N,
+                                       d = effect_size,
+                                       sig.level = input$alpha,
+                                       alternative = alternative[[two_sided]])[["power"]],
+                            pwr.norm.test(n = N,
+                                          d = effect_size,
+                                          sig.level = input$alpha,
+                                          alternative = alternative[[two_sided]])[["power"]])
         }
         if(as.numeric(input$pow_curve) == 2)
         {

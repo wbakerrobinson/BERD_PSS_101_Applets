@@ -60,7 +60,7 @@ alpha_pow_curve_t <- function(N, effect_size, alpha, power, side)
     # Color for user entered
     geom_point(power_data_user %>% filter(N %% 5 == 0), mapping = aes(x = N, y = power), shape = 17, color = "#E69F00") +
     geom_line(power_data_user, mapping = aes(x = N, y = power), color = "#E69F00") +
-    geom_point(mapping = aes(x = N, y = power), color = "#0072B2", shape = 17) +
+    geom_point(mapping = aes(x = N, y = power), color = "#0072B2", shape = 17, size = 2) +
     geom_text(label_non_user, mapping = aes(x = N + 6, y = max, label = alpha_level), color = "#999999") +
     geom_text(mapping = aes(x = N + 6, y = max(power_data_user$power), label = alpha), color = "#E69F00") +
     theme_bw() +
@@ -131,7 +131,7 @@ alpha_pow_curve_z <- function(N, effect_size, alpha, power, side)
     # Color for user entered
     geom_point(power_data_user %>% filter(N %% 5 == 0), mapping = aes(x = N, y = power), shape = 17, color = "#E69F00") +
     geom_line(power_data_user, mapping = aes(x = N, y = power), color = "#E69F00") +
-    geom_point(mapping = aes(x = N, y = power), color = "#0072B2", shape = 17) +
+    geom_point(mapping = aes(x = N, y = power), color = "#0072B2", shape = 17, size = 2) +
     geom_text(label_non_user, mapping = aes(x = N + 6, y = max, label = alpha_level), color = "#999999") +
     geom_text(mapping = aes(x = N + 6, y = max(power_data_user$power), label = alpha), color = "#E69F00") +
     theme_bw() +
@@ -203,7 +203,7 @@ effect_pow_curve_t <- function(N, effect_size, alpha, power, side)
     # Color for user entered
     geom_point(power_data_user %>% filter(N %% 5 == 0), mapping = aes(x = N, y = power), shape = 17, color = "#E69F00") +
     geom_line(power_data_user, mapping = aes(x = N, y = power), color = "#E69F00") +
-    geom_point(mapping = aes(x = N, y = power), color = "#0072B2", shape = 17) +
+    geom_point(mapping = aes(x = N, y = power), color = "#0072B2", shape = 17, size = 2) +
     geom_text(label_non_user, mapping = aes(x = N + 6, y = max, label = effect_val), color = "#999999") +
     geom_text(mapping = aes(x = N + 6, y = max(power_data_user$power), label = effect_size), color = "#E69F00") +
     theme_bw() +
@@ -275,7 +275,7 @@ effect_pow_curve_z <- function(N, effect_size, alpha, power, side)
     # Color for user entered
     geom_point(power_data_user %>% filter(N %% 5 == 0), mapping = aes(x = N, y = power), shape = 17, color = "#E69F00") +
     geom_line(power_data_user, mapping = aes(x = N, y = power), color = "#E69F00") +
-    geom_point(mapping = aes(x = N, y = power), color = "#0072B2", shape = 17) +
+    geom_point(mapping = aes(x = N, y = power), color = "#0072B2", shape = 17, size = 2) +
     geom_text(label_non_user, mapping = aes(x = N + 6, y = max, label = effect_val), color = "#999999") +
     geom_text(mapping = aes(x = N + 6, y = max(power_data_user$power), label = effect_size), color = "#E69F00") +
     theme_bw() +
