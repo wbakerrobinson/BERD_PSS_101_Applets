@@ -9,10 +9,18 @@ library(dplyr)
 library(tidyr)
 library(pwr)
 library(glue)
+library(purrr)
 
 # Source files for app
 source("ggplot_trad_power_viz_fx.R", local = TRUE)
-source("ggplot_power_curve_viz_fx.R", local = TRUE)
+source("ggplot_N_power_curve_viz_fx.R", local = TRUE)
+source("ggplot_Pow_power_curve_viz_fx.R", local = TRUE)
+
+# update line, point, text, segment
+update_geom_defaults("line", list(size = 1.15))
+update_geom_defaults("segment", list(size = 1.15))
+update_geom_defaults("point", list(size = 3))
+update_geom_defaults("text", list(size = 5))
 
 ui <- fluidPage(
     
@@ -43,22 +51,22 @@ ui <- fluidPage(
                               selected = 2),
                  sliderInput("mu0",
                               "Mean under H0:",
-                             min = 0,
-                             max = 3,
+                             min = 30,
+                             max = 50,
                              step = 0.5,
-                              value = 0),
+                              value = 34),
                  sliderInput("muA",
                               "Mean under HA:",
-                              min = 0,
-                              max = 3,
-                              value = 1,
+                              min = 30,
+                              max = 50,
+                              value = 46.5,
                               step = 0.5),
                  sliderInput("sd",
                              "Standard Deviation:",
-                             min = 0.1, 
-                             max = 3,
-                             value = 1,
-                             step = 0.1),
+                             min = 10, 
+                             max = 30,
+                             value = 25,
+                             step = 0.5),
                  checkboxInput("sd_known",
                                "Standard Deviation Known?",
                                value = TRUE),
@@ -66,15 +74,15 @@ ui <- fluidPage(
                  conditionalPanel(condition = "input.which_calc == 1",
                                   sliderInput("N",
                                               "Sample Size:",
-                                              min = 1,
-                                              max = 30,
-                                              value = 20,
-                                              step = 2)),
+                                              min = 5,
+                                              max = 50,
+                                              value = 35,
+                                              step = 1)),
                  # Conditional panel for N calc
                  conditionalPanel(condition = "input.which_calc == 2",
                                   sliderInput("power",
                                               "Power:",
-                                              min = 0.50,
+                                              min = 0.60,
                                               max = 0.99,
                                               value = 0.80,
                                               step = 0.01)),
@@ -111,9 +119,23 @@ server <- function(input, output, session) {
     # used in determining side of pwr.func
     alternative <- c("greater", "two.sided")
     
-    # used to change muA slider to a value 0.1 greater if the user sets the two equal
+    # used to change muA slider to a value 1 greater if the user sets the two equal
     observe({
-        updateSliderInput(session, "muA", value = ifelse(input$mu0 == input$muA, input$muA + 0.1, input$muA))
+        if(input$muA == input$mu0) {
+           if(input$mu0 == 50) {
+            updateSliderInput(session,
+                              inputId = "muA",
+                              value = input$muA - 1)
+           }else{
+            updateSliderInput(session,
+                              inputId = "muA",
+                              value = input$muA + 1)
+           }
+        }
+        # print(sprintf("input$muA = %s  input$mu0 = %s  val = %s", input$muA, input$mu0, val))
+        # updateSliderInput(session,
+        #                   inputId = "muA",
+        #                   value = val)
     })
     
     # Values displayed above plot
@@ -154,8 +176,25 @@ server <- function(input, output, session) {
             crit_val <- qt(1 - input$alpha / two_sided, df = N-1)
             crit_output <- sprintf("T Critival Value: %s %s", ifelse(two_sided == 2, "-/+", ''), round(crit_val, 3))
         }else{
-            crit_val <- qnorm(1 - input$alpha/two_sided, mean = input$mu0, sd = input$sd/sqrt(N))
-            crit_output <- sprintf("Z Critical Value: %s %s", ifelse(two_sided == 2, "-/+", ''), round(crit_val, 3))
+            if(two_sided == 2){
+                # Upper and lower
+                crit_val_lwr <- qnorm(input$alpha/two_sided, mean = input$mu0, sd = input$sd/sqrt(N))
+                crit_val_upr <- qnorm(1 - input$alpha/two_sided, mean = input$mu0, sd = input$sd/sqrt(N))
+                crit_output <- sprintf("Z Critical Value: %s, %s", round(crit_val_lwr, 3), round(crit_val_upr, 3))
+            }
+            else{
+                # lower or upper
+                if(input$mu0 < input$muA)
+                {
+                    crit_val <- qnorm(1 - input$alpha, mean = input$mu0, sd = input$sd/sqrt(N))
+                    crit_output <- sprintf("Z Critical Value: %s", round(crit_val, 3))
+                }
+                else
+                {
+                   crit_val <- qnorm(input$alpha, mean = input$mu0, sd = input$sd/sqrt(N))
+                   crit_output <- sprintf("Z Critical Value: %s", round(crit_val, 3))
+                }
+            }
         }
         
         # return vars
@@ -269,13 +308,13 @@ server <- function(input, output, session) {
                 }
             }
         }
-    }, height = 655)
+    }, height = 555)
 
     #Power curve
     output$pow_curve <- renderPlot({
         power <- -1
         N <- -1
-        effect_size <- abs(input$mu0 - input$muA)/input$sd
+        effect_size <- round(abs(input$mu0 - input$muA)/input$sd, 3)
         two_sided <- as.numeric(input$two_sided)
         if(as.numeric(input$which_calc) == 1){
             power <- ifelse(input$sd_known == FALSE,
@@ -299,39 +338,41 @@ server <- function(input, output, session) {
                                       power = input$power,
                                       alternative = alternative[[two_sided]])[["n"]])
             N <- ceiling(N)
-            # power <- input$power
-            # Really janky but without sequencing by power instead of N the points don't plot correctly
-            power <- ifelse(input$sd_known == FALSE,
-                            pwr.t.test(n = N,
-                                       d = effect_size,
-                                       sig.level = input$alpha,
-                                       alternative = alternative[[two_sided]])[["power"]],
-                            pwr.norm.test(n = N,
-                                          d = effect_size,
-                                          sig.level = input$alpha,
-                                          alternative = alternative[[two_sided]])[["power"]])
+            power <- input$power
         }
         if(as.numeric(input$pow_curve) == 2)
         {
             # Alpha case
             if(input$sd_known == FALSE){
                 # Student's T
-                alpha_pow_curve_t(N, effect_size, input$alpha, power, alternative[two_sided])
+                if(as.numeric(input$which_calc) == 1)
+                    N_alpha_pow_curve_t(N, effect_size, input$alpha, power, alternative[two_sided])
+                else
+                    Pow_alpha_pow_curve_t(N, effect_size, input$alpha, power, alternative[two_sided])
             } else{
                 # Normal
-                alpha_pow_curve_z(N, effect_size, input$alpha, power, alternative[two_sided])
+                if(as.numeric(input$which_calc) == 1)
+                    N_alpha_pow_curve_z(N, effect_size, input$alpha, power, alternative[two_sided])
+                else
+                    Pow_alpha_pow_curve_z(N, effect_size, input$alpha, power, alternative[two_sided])
             }
         } else{
             # Effect size case
             if(input$sd_known == FALSE){
                 # Student's T
-                effect_pow_curve_t(N, effect_size, input$alpha, power, alternative[two_sided])
+                if(as.numeric(input$which_calc) == 1)
+                    N_effect_pow_curve_t(N, effect_size, input$alpha, power, alternative[two_sided])
+                else
+                    Pow_effect_pow_curve_t(N, effect_size, input$alpha, power, alternative[two_sided])
             } else{
                 # Normal
-                effect_pow_curve_z(N, effect_size, input$alpha, power, alternative[two_sided])
+                if(as.numeric(input$which_calc) == 1)
+                    N_effect_pow_curve_z(N, effect_size, input$alpha, power, alternative[two_sided])
+                else
+                    Pow_effect_pow_curve_z(N, effect_size, input$alpha, power, alternative[two_sided])
             }
         }
-    }, height = 655)
+    }, height = 600)
 }
 
 shinyApp(ui = ui, server = server)

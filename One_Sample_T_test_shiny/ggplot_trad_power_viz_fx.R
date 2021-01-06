@@ -10,6 +10,9 @@
 two_sided_t <- function(data, test_stat, color)
 {
   max_h0 <- max(data$pdf_h0)
+  plot_size <- 18
+  text_size <- 5
+  
   ggplot(data) + 
     geom_area(mapping = aes(y = ifelse(x_val < -test_stat | x_val > test_stat, pdf_h0, 0),
                             x= x_val, 
@@ -51,11 +54,11 @@ two_sided_t <- function(data, test_stat, color)
     labs(x = "T values",
          y = "",
          title = "Traditional Power Visualization: 1 Sample T-test") +
-    annotate("text", x = 0, y = max(data$pdf_h0) + 0.01, label = glue("H0")) +
-    annotate("text", x = data[[which.max(data$pdf_hA),1]], y = max(data$pdf_hA) + 0.01, label = glue("HA")) +
-    annotate("text", x = -test_stat, y = max_h0 + 0.01, label = glue("-Tcrit")) +
-    annotate("text", x = test_stat, y = max_h0 + 0.01, label = glue("+Tcrit")) +
-    theme_bw() +
+    annotate("text", x = 0, y = max(data$pdf_h0) + 0.01, label = glue("H0"), size = text_size) +
+    annotate("text", x = data[[which.max(data$pdf_hA),1]], y = max(data$pdf_hA) + 0.01, label = glue("HA"), size = text_size) +
+    annotate("text", x = -test_stat, y = max_h0 + 0.01, label = glue("-Tcrit"), size = text_size) +
+    annotate("text", x = test_stat, y = max_h0 + 0.01, label = glue("+Tcrit"), size = text_size) +
+    theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
     theme(legend.position="bottom")
 }
@@ -63,6 +66,8 @@ two_sided_t <- function(data, test_stat, color)
 one_sided_t <- function(data, test_stat, color)
 {
   max_h0 <- max(data$pdf_h0)
+  text_size <- 5
+  plot_size <- 18
   
   ggplot(data) + 
     geom_area(mapping = aes(y = ifelse(x_val > test_stat, pdf_h0, 0),
@@ -93,10 +98,10 @@ one_sided_t <- function(data, test_stat, color)
                  color = "#999999") + 
     labs(x = "T values",
          title = "Traditional Power Visualization: 1 Sample T-test") +
-    annotate("text", x = 0, y = max(data$pdf_h0) + 0.01, label = glue("H0")) +
-    annotate("text", x = data[[which.max(data$pdf_hA),1]], y = max(data$pdf_hA) + 0.01, label = glue("HA")) +
-    annotate("text", x = test_stat, y = max_h0 + 0.01, label = glue("Tcrit")) +
-    theme_bw() +
+    annotate("text", x = 0, y = max(data$pdf_h0) + 0.01, label = glue("H0"), size = text_size) +
+    annotate("text", x = data[[which.max(data$pdf_hA),1]], y = max(data$pdf_hA) + 0.01, label = glue("HA"), size = text_size) +
+    annotate("text", x = test_stat, y = max_h0 + 0.01, label = glue("Tcrit"), size = text_size) +
+    theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
     theme(legend.position="bottom")
 }
@@ -105,7 +110,10 @@ one_sided_t <- function(data, test_stat, color)
 two_sided_z_h0_leq <- function(data, mu0, muA, test_stat, neg_test_stat, color)
 {
   max_h0 <- max(data$pdf_h0)
-  label_height <- max_h0 + max_h0/30
+  label_height <- ifelse(max_h0 < 0.25, max_h0 + 0.008, 0.25)
+  plot_size <- 18
+  text_size <- 5
+  
   ggplot(data) + 
     geom_ribbon(data %>% filter(x_val < neg_test_stat),
                 mapping = aes(ymax = pdf_h0,
@@ -145,32 +153,35 @@ two_sided_z_h0_leq <- function(data, mu0, muA, test_stat, neg_test_stat, color)
     geom_segment(aes(x = neg_test_stat, 
                      y = 0, 
                      xend = neg_test_stat, 
-                     yend = max_h0),
+                     yend = label_height - 0.008),
                  alpha = 0.7,
                  color = "#999999") + 
     geom_segment(aes(x = test_stat, 
                      y = 0,
                      xend = test_stat, 
-                     yend = max_h0), 
+                     yend = label_height - 0.008), 
                  alpha = 0.7,
                  color = "#999999") + 
     labs(x = "Z Values",
          y = "",
          title = "Traditional Power Visualization: 1 Sample Z-test") +
-    annotate("text", x = mu0, y = label_height, label = glue("H0")) +
-    annotate("text", x = muA, y = label_height, label = glue("HA")) +
-    annotate("text", x = neg_test_stat, y = label_height, label = glue("-Zcrit")) +
-    annotate("text", x = test_stat, y = label_height, label = glue("+Zcrit")) +
-    theme_bw() +
+    annotate("text", x = mu0, y = label_height, label = glue("H0"), size = text_size) +
+    annotate("text", x = muA, y = label_height, label = glue("HA"), size = text_size) +
+    annotate("text", x = neg_test_stat, y = label_height, label = glue("-Zcrit"), size = text_size) +
+    annotate("text", x = test_stat, y = label_height, label = glue("+Zcrit"), size = text_size) +
+    theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
     theme(legend.position="bottom") +
-    coord_cartesian(xlim = c(-2, 4), ylim = c(0, 2))
+    coord_cartesian(xlim = c(20, 60), ylim = c(0, 0.25))
 }
 
 one_sided_z_h0_leq <- function(data, mu0, muA, test_stat, color)
 {
   max_h0 <- max(data$pdf_h0)
-  label_height <- max_h0 + max_h0/30
+  label_height <- ifelse(max_h0 < 0.25, max_h0 + 0.008, 0.25)
+  text_size <- 5
+  plot_size <- 18
+  
   ggplot(data) + 
     geom_area(mapping = aes(y = ifelse(x_val > test_stat, pdf_h0, 0),
                             x= x_val, 
@@ -196,25 +207,28 @@ one_sided_z_h0_leq <- function(data, mu0, muA, test_stat, color)
     geom_segment(aes(x = test_stat, 
                      y = 0,
                      xend = test_stat, 
-                     yend = max_h0), 
+                     yend = label_height - 0.008), 
                  alpha = 0.7,
                  color = "#999999") + 
     labs(x = "Z values",
          y = "",
          title = "Traditional Power Visualization: 1 Sample Z-test") +
-    annotate("text", x = mu0, y = label_height, label = glue("H0")) +
-    annotate("text", x = muA, y = label_height, label = glue("HA")) +
-    annotate("text", x = test_stat, y = label_height, label = glue("Zcrit")) +
-    theme_bw() +
+    annotate("text", x = mu0, y = label_height, label = glue("H0"), size = text_size) +
+    annotate("text", x = muA, y = label_height, label = glue("HA"), size = text_size) +
+    annotate("text", x = test_stat, y = label_height, label = glue("Zcrit"), size = text_size) +
+    theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
     theme(legend.position="bottom") +
-    coord_cartesian(xlim = c(-2, 4), ylim = c(0, 2))
+    coord_cartesian(xlim = c(20, 60), ylim = c(0, 0.25))
 }
 
 two_sided_z_h0_greater <- function(data, mu0, muA, test_stat, neg_test_stat, color)
 {
   max_h0 <- max(data$pdf_h0)
-  label_height <- max_h0 + max_h0/30
+  label_height <- ifelse(max_h0 < 0.25, max_h0 + 0.008, 0.25)
+  plot_size <- 18
+  text_size <- 5
+  
   ggplot(data) + 
     geom_ribbon(data %>% filter(x_val < neg_test_stat),
                 mapping = aes(ymax = pdf_h0,
@@ -254,32 +268,35 @@ two_sided_z_h0_greater <- function(data, mu0, muA, test_stat, neg_test_stat, col
     geom_segment(aes(x = neg_test_stat, 
                      y = 0, 
                      xend = neg_test_stat, 
-                     yend = max_h0),
+                     yend = label_height - 0.008),
                  alpha = 0.7,
                  color = "#999999") + 
     geom_segment(aes(x = test_stat, 
                      y = 0,
                      xend = test_stat, 
-                     yend = max_h0), 
+                     yend = label_height - 0.008), 
                  alpha = 0.7,
                  color = "#999999") + 
     labs(x = "Z values",
          y = "",
          title = "Traditional Power Visualization: 1 Sample Z-test") +
-    annotate("text", x = mu0, y = label_height, label = glue("H0")) +
-    annotate("text", x = muA, y = label_height, label = glue("HA")) +
-    annotate("text", x = neg_test_stat, y = label_height, label = glue("-Zcrit")) +
-    annotate("text", x = test_stat, y = label_height, label = glue("+Zcrit")) +
-    theme_bw() +
+    annotate("text", x = mu0, y = label_height, label = glue("H0"), size = text_size) +
+    annotate("text", x = muA, y = label_height, label = glue("HA"), size = text_size) +
+    annotate("text", x = neg_test_stat, y = label_height, label = glue("-Zcrit"), size = text_size) +
+    annotate("text", x = test_stat, y = label_height, label = glue("+Zcrit"), size = text_size) +
+    theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
     theme(legend.position="bottom") +
-    coord_cartesian(xlim = c(-2, 4), ylim = c(0, 2))
+    coord_cartesian(xlim = c(20, 60), ylim = c(0, 0.25))
 }
 
 one_sided_z_h0_greater <- function(data, mu0, muA, neg_test_stat, color)
 {
   max_h0 <- max(data$pdf_h0)
-  label_height <- max_h0 + max_h0/30
+  label_height <- ifelse(max_h0 < 0.25, max_h0 + 0.008, 0.25)
+  plot_size <- 18
+  text_size <- 5
+  
   ggplot(data) + 
     geom_ribbon(data %>% filter(x_val < neg_test_stat),
                 mapping = aes(ymax = pdf_h0,
@@ -309,19 +326,19 @@ one_sided_z_h0_greater <- function(data, mu0, muA, neg_test_stat, color)
     geom_segment(aes(x = neg_test_stat, 
                      y = 0, 
                      xend = neg_test_stat, 
-                     yend = max_h0),
+                     yend = label_height - 0.008),
                  alpha = 0.7,
                  color = "#999999") + 
     labs(x = "Z values",
          y = "",
          title = "Traditional Power Visualization: 1 Sample Z-test") +
-    annotate("text", x = mu0, y = label_height, label = glue("H0")) +
-    annotate("text", x = muA, y = label_height, label = glue("HA")) +
-    annotate("text", x = neg_test_stat, y = label_height, label = glue("Zcrit")) +
-    theme_bw() +
+    annotate("text", x = mu0, y = label_height, label = glue("H0"), size = text_size) +
+    annotate("text", x = muA, y = label_height, label = glue("HA"), size = text_size) +
+    annotate("text", x = neg_test_stat, y = label_height, label = glue("Zcrit"), size = text_size) +
+    theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
     theme(legend.position="bottom") +
-    coord_cartesian(xlim = c(-2, 4), ylim = c(0, 2))
+    coord_cartesian(xlim = c(20, 60), ylim = c(0, 0.25))
 }
 
 # ---------------------------------------- CODE BELOW IS FOR TESTING PURPOSES--------------------------------------------
@@ -389,7 +406,7 @@ one_sided_z_h0_greater <- function(data, mu0, muA, neg_test_stat, color)
 #   distr_sd <- sd/sqrt(N)
 #   test_stat <- qnorm(1 - alpha/two_sided, mean = mu0, sd = distr_sd)
 #   neg_test_stat <- ifelse(mu0 != 0, qnorm(alpha/two_sided, mean = mu0, sd = distr_sd), -test_stat)
-#   
+# 
 #   # mu0 <= muA
 #   if(mu0 <= muA){
 #     upr_h0 <- mu0 + 3.5*distr_sd
