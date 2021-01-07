@@ -162,13 +162,13 @@ two_sided_z_h0_leq <- function(data, mu0, muA, test_stat, neg_test_stat, color)
                      yend = label_height - 0.008), 
                  alpha = 0.7,
                  color = "#999999") + 
-    labs(x = "Z Values",
+    labs(x = "Mean Values",
          y = "",
          title = "Traditional Power Visualization: 1 Sample Z-test") +
     annotate("text", x = mu0, y = label_height, label = glue("H0"), size = text_size) +
     annotate("text", x = muA, y = label_height, label = glue("HA"), size = text_size) +
-    annotate("text", x = neg_test_stat, y = label_height, label = glue("-Zcrit"), size = text_size) +
-    annotate("text", x = test_stat, y = label_height, label = glue("+Zcrit"), size = text_size) +
+    annotate("text", x = neg_test_stat, y = label_height, label = glue("-Critical Value"), size = text_size) +
+    annotate("text", x = test_stat, y = label_height, label = glue("+Critical Value"), size = text_size) +
     theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
     theme(legend.position="bottom") +
@@ -210,12 +210,12 @@ one_sided_z_h0_leq <- function(data, mu0, muA, test_stat, color)
                      yend = label_height - 0.008), 
                  alpha = 0.7,
                  color = "#999999") + 
-    labs(x = "Z values",
+    labs(x = "Mean Values",
          y = "",
          title = "Traditional Power Visualization: 1 Sample Z-test") +
     annotate("text", x = mu0, y = label_height, label = glue("H0"), size = text_size) +
     annotate("text", x = muA, y = label_height, label = glue("HA"), size = text_size) +
-    annotate("text", x = test_stat, y = label_height, label = glue("Zcrit"), size = text_size) +
+    annotate("text", x = test_stat, y = label_height, label = glue("Critical Value"), size = text_size) +
     theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
     theme(legend.position="bottom") +
@@ -277,13 +277,13 @@ two_sided_z_h0_greater <- function(data, mu0, muA, test_stat, neg_test_stat, col
                      yend = label_height - 0.008), 
                  alpha = 0.7,
                  color = "#999999") + 
-    labs(x = "Z values",
+    labs(x = "Mean Values",
          y = "",
          title = "Traditional Power Visualization: 1 Sample Z-test") +
     annotate("text", x = mu0, y = label_height, label = glue("H0"), size = text_size) +
     annotate("text", x = muA, y = label_height, label = glue("HA"), size = text_size) +
-    annotate("text", x = neg_test_stat, y = label_height, label = glue("-Zcrit"), size = text_size) +
-    annotate("text", x = test_stat, y = label_height, label = glue("+Zcrit"), size = text_size) +
+    annotate("text", x = neg_test_stat, y = label_height, label = glue("-Critical Value"), size = text_size) +
+    annotate("text", x = test_stat, y = label_height, label = glue("+Critical Value"), size = text_size) +
     theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
     theme(legend.position="bottom") +
@@ -329,12 +329,12 @@ one_sided_z_h0_greater <- function(data, mu0, muA, neg_test_stat, color)
                      yend = label_height - 0.008),
                  alpha = 0.7,
                  color = "#999999") + 
-    labs(x = "Z values",
+    labs(x = "Mean Values",
          y = "",
          title = "Traditional Power Visualization: 1 Sample Z-test") +
     annotate("text", x = mu0, y = label_height, label = glue("H0"), size = text_size) +
     annotate("text", x = muA, y = label_height, label = glue("HA"), size = text_size) +
-    annotate("text", x = neg_test_stat, y = label_height, label = glue("Zcrit"), size = text_size) +
+    annotate("text", x = neg_test_stat, y = label_height, label = glue("Critical Value"), size = text_size) +
     theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
     theme(legend.position="bottom") +

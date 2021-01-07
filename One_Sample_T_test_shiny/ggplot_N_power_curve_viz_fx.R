@@ -14,32 +14,13 @@ N_alpha_pow_curve_t <- function(N, effect_size, alpha, power, side)
     power_data <- tibble(N = rep.int(seq(2, ifelse(N < 45, N + 5, 50), 1), 3)) %>%
       arrange(N) %>%
       mutate(alpha_level = rep.int(alpha_presets, length(N)/3),
-             power = map2_dbl(N, alpha_level, ~pwr.t.test(n = .x, sig.level = .y, d = effect_size, alternative = side)[["power"]]))
+             power = map2_dbl(N, alpha_level, ~pwr.t.test(n = .x, sig.level = .y, d = effect_size, type = "one.sample", alternative = side)[["power"]]))
   }else{
     power_data <- tibble(N = rep.int(seq(2, ifelse(N < 45, N + 5, 50), 1), 3)) %>%
       arrange(N) %>%
       mutate(alpha_level = rep.int(c(0.01, 0.05, 0.10, alpha), length(N)/4),
-             power = map2_dbl(N, alpha_level, ~pwr.t.test(n = .x, sig.level = .y, d = effect_size, alternative = side)[["power"]]))
+             power = map2_dbl(N, alpha_level, ~pwr.t.test(n = .x, sig.level = .y, d = effect_size, type = "one.sample", alternative = side)[["power"]]))
   }
-  
-  # if(alpha %in% alpha_presets){
-  #   power_data <- tibble(N = seq(2, N + 5, 1),
-  #                        alpha0.01 = pwr.t.test(n = N, d= effect_size, sig.level = 0.01, alternative = side)[["power"]],
-  #                        alpha0.05 = pwr.t.test(n = N, d = effect_size, sig.level = 0.05, alternative = side)[["power"]],
-  #                        alpha0.10 = pwr.t.test(n = N, d = effect_size, sig.level = 0.10, alternative = side)[["power"]])
-  # }else{
-  #   power_data <- tibble(N = seq(2, N + 5, 1),
-  #                        alpha0.01 = pwr.t.test(n = N, d = effect_size, sig.level = 0.01, alternative = side)[["power"]],
-  #                        alpha0.05 = pwr.t.test(n = N, d = effect_size, sig.level = 0.05, alternative = side)[["power"]],
-  #                        alpha0.10 = pwr.t.test(n = N, d = effect_size, sig.level = 0.10, alternative = side)[["power"]],
-  #                        user_alpha = pwr.t.test(n = N, d = effect_size, sig.level = alpha, alternative = side)[["power"]]) %>%
-  #     rename(!!paste0("alpha", alpha) := user_alpha)
-  # }
-  # power_data <- power_data %>%
-  #   pivot_longer(starts_with("alpha"),
-  #                names_prefix = "alpha",
-  #                values_to = "power",
-  #                names_to = "alpha_level")
   
   power_data_non_user <- power_data %>%
     filter(alpha != alpha_level)
@@ -103,27 +84,6 @@ N_alpha_pow_curve_z <- function(N, effect_size, alpha, power, side)
              power = map2_dbl(N, alpha_level, ~pwr.norm.test(n = .x, sig.level = .y, d = effect_size, alternative = side)[["power"]]))
   }
   
-  # if(alpha %in% alpha_presets)
-  # {
-  #   power_data <- tibble(N = seq(2, N + 5, 1),
-  #                        alpha0.01 = pwr.norm.test(n = N, d = effect_size, sig.level = 0.01, alternative = side)[["power"]],
-  #                        alpha0.05 = pwr.norm.test(n = N, d = effect_size, sig.level = 0.05, alternative = side)[["power"]],
-  #                        alpha0.10 = pwr.norm.test(n = N, d = effect_size, sig.level = 0.10, alternative = side)[["power"]])
-  # } else
-  # {
-  #   power_data <- tibble(N = seq(2, N + 5, 1),
-  #                        alpha0.01 = pwr.norm.test(n = N, d = effect_size, sig.level = 0.01, alternative = side)[["power"]],
-  #                        alpha0.05 = pwr.norm.test(n = N, d = effect_size, sig.level = 0.05, alternative = side)[["power"]],
-  #                        alpha0.10 = pwr.norm.test(n = N, d = effect_size, sig.level = 0.10, alternative = side)[["power"]],
-  #                        user_alpha = pwr.norm.test(n = N, d = effect_size, sig.level = alpha, alternative = side)[["power"]]) %>%
-  #     rename(!!paste0("alpha", alpha) := user_alpha)
-  # }
-  # power_data <- power_data %>%
-  #   pivot_longer(starts_with("alpha"),
-  #                names_prefix = "alpha",
-  #                values_to = "power",
-  #                names_to = "alpha_level")
-  
   power_data_non_user <- power_data %>%
     filter(alpha != alpha_level)
   
@@ -181,35 +141,13 @@ N_effect_pow_curve_t <- function(N, effect_size, alpha, power, side)
     power_data <- tibble(N = rep.int(seq(2, ifelse(N < 45, N + 5, 50), 1), 3)) %>%
       arrange(N) %>%
       mutate(effect_val = rep.int(std_effect, length(N)/3),
-             power = map2_dbl(N, effect_val, ~pwr.t.test(n = .x, sig.level = alpha, d = .y, alternative = side)[["power"]]))
+             power = map2_dbl(N, effect_val, ~pwr.t.test(n = .x, sig.level = alpha, d = .y, type = "one.sample", alternative = side)[["power"]]))
   }else{
     power_data <- tibble(N = rep.int(seq(2, ifelse(N < 45, N + 5, 50), 1), 4)) %>%
       arrange(N) %>%
       mutate(effect_val = rep.int(c(0.2, 0.5, 0.8, effect_size), length(N)/4),
-             power = map2_dbl(N, effect_val, ~pwr.t.test(n = .x, sig.level = alpha, d = .y, alternative = side)[["power"]]))
+             power = map2_dbl(N, effect_val, ~pwr.t.test(n = .x, sig.level = alpha, d = .y, type = "one.sample", alternative = side)[["power"]]))
   }
-  
-  # if(effect_size %in% std_effect)
-  # {
-  #   power_data <- tibble(N = seq(2, N + 5, 1),
-  #                        !!paste0("effect", std_effect[1]) := pwr.t.test(n = N, d = std_effect[1], sig.level = alpha, alternative = side)[["power"]],
-  #                        !!paste0("effect", std_effect[2]) := pwr.t.test(n = N, d = std_effect[2], sig.level = alpha, alternative = side)[["power"]],
-  #                        !!paste0("effect", std_effect[3]) := pwr.t.test(n = N, d = std_effect[3], sig.level = alpha, alternative = side)[["power"]])
-  # } else
-  # {
-  #   power_data <- tibble(N = seq(2, N + 5, 1),
-  #                        !!paste0("effect", std_effect[1]) := pwr.t.test(n = N, d = std_effect[1], sig.level = alpha, alternative = side)[["power"]],
-  #                        !!paste0("effect", std_effect[2]) := pwr.t.test(n = N, d = std_effect[2], sig.level = alpha, alternative = side)[["power"]],
-  #                        !!paste0("effect", std_effect[3]) := pwr.t.test(n = N, d = std_effect[3], sig.level = alpha, alternative = side)[["power"]],
-  #                        user_effect = pwr.t.test(n = N, d = effect_size, sig.level = alpha, alternative = side)[["power"]]) %>%
-  #     rename(!!paste0("effect", effect_size) := user_effect)
-  # }
-  # power_data <- power_data %>%
-  #   pivot_longer(starts_with("effect"),
-  #                names_prefix = "effect",
-  #                names_transform = list("effect_val" = as.double),
-  #                values_to = "power",
-  #                names_to = "effect_val")
   
   power_data_non_user <- power_data %>%
     filter(effect_size != effect_val)
@@ -275,28 +213,6 @@ N_effect_pow_curve_z <- function(N, effect_size, alpha, power, side)
       mutate(effect_val = rep.int(c(0.2, 0.5, 0.8, effect_size), length(N)/4),
              power = map2_dbl(N, effect_val, ~pwr.norm.test(n = .x, sig.level = alpha, d = .y, alternative = side)[["power"]]))
   }
-  
-  # if(effect_size %in% std_effect)
-  # {
-  #   power_data <- tibble(N = seq(2, N + 5, 1),
-  #                        !!paste0("effect", std_effect[1]) := pwr.norm.test(n = N, d = std_effect[1], sig.level = alpha, alternative = side)[["power"]],
-  #                        !!paste0("effect", std_effect[2]) := pwr.norm.test(n = N, d = std_effect[2], sig.level = alpha, alternative = side)[["power"]],
-  #                        !!paste0("effect", std_effect[3]) := pwr.norm.test(n = N, d = std_effect[3], sig.level = alpha, alternative = side)[["power"]])
-  # } else
-  # {
-  #   power_data <- tibble(N = seq(2, N + 5, 1),
-  #                        !!paste0("effect", std_effect[1]) := pwr.norm.test(n = N, d = std_effect[1], sig.level = alpha, alternative = side)[["power"]],
-  #                        !!paste0("effect", std_effect[2]) := pwr.norm.test(n = N, d = std_effect[2], sig.level = alpha, alternative = side)[["power"]],
-  #                        !!paste0("effect", std_effect[3]) := pwr.norm.test(n = N, d = std_effect[3], sig.level = alpha, alternative = side)[["power"]],
-  #                        user_effect = pwr.norm.test(n = N, d = effect_size, sig.level = alpha, alternative = side)[["power"]]) %>%
-  #     rename(!!paste0("effect", effect_size) := user_effect)
-  # }
-  # power_data <- power_data %>%
-  #   pivot_longer(starts_with("effect"),
-  #                names_prefix = "effect",
-  #                names_transform = list("effect_val" = as.double),
-  #                values_to = "power",
-  #                names_to = "effect_val")
   
   power_data_non_user <- power_data %>%
     filter(effect_size != effect_val)

@@ -65,7 +65,7 @@ ui <- fluidPage(
                              "Standard Deviation:",
                              min = 10, 
                              max = 30,
-                             value = 25,
+                             value = 25.5,
                              step = 0.5),
                  checkboxInput("sd_known",
                                "Standard Deviation Known?",
@@ -132,10 +132,6 @@ server <- function(input, output, session) {
                               value = input$muA + 1)
            }
         }
-        # print(sprintf("input$muA = %s  input$mu0 = %s  val = %s", input$muA, input$mu0, val))
-        # updateSliderInput(session,
-        #                   inputId = "muA",
-        #                   value = val)
     })
     
     # Values displayed above plot
@@ -152,6 +148,7 @@ server <- function(input, output, session) {
                             pwr.t.test(n = input$N,
                                        d = user_effect,
                                        sig.level = input$alpha,
+                                       type = "one.sample",
                                        alternative = alternative[[two_sided]])[["power"]],
                             pwr.norm.test(n = input$N,
                                           d = user_effect,
@@ -163,6 +160,7 @@ server <- function(input, output, session) {
                         pwr.t.test(d = user_effect,
                                    sig.level = input$alpha,
                                    power = input$power,
+                                   type = "one.sample",
                                    alternative = alternative[[two_sided]])[["n"]],
                         pwr.norm.test(d = user_effect,
                                       sig.level = input$alpha,
@@ -180,19 +178,19 @@ server <- function(input, output, session) {
                 # Upper and lower
                 crit_val_lwr <- qnorm(input$alpha/two_sided, mean = input$mu0, sd = input$sd/sqrt(N))
                 crit_val_upr <- qnorm(1 - input$alpha/two_sided, mean = input$mu0, sd = input$sd/sqrt(N))
-                crit_output <- sprintf("Z Critical Value: %s, %s", round(crit_val_lwr, 3), round(crit_val_upr, 3))
+                crit_output <- sprintf("Critical Values: %s, %s", round(crit_val_lwr, 3), round(crit_val_upr, 3))
             }
             else{
                 # lower or upper
                 if(input$mu0 < input$muA)
                 {
                     crit_val <- qnorm(1 - input$alpha, mean = input$mu0, sd = input$sd/sqrt(N))
-                    crit_output <- sprintf("Z Critical Value: %s", round(crit_val, 3))
+                    crit_output <- sprintf("Critical Value: %s", round(crit_val, 3))
                 }
                 else
                 {
                    crit_val <- qnorm(input$alpha, mean = input$mu0, sd = input$sd/sqrt(N))
-                   crit_output <- sprintf("Z Critical Value: %s", round(crit_val, 3))
+                   crit_output <- sprintf("Critical Value: %s", round(crit_val, 3))
                 }
             }
         }
@@ -230,6 +228,7 @@ server <- function(input, output, session) {
                             pwr.t.test(n = input$N,
                                        d = effect_size,
                                        sig.level = input$alpha,
+                                       type = "one.sample",
                                        alternative = alternative[[two_sided]])[["power"]],
                             pwr.norm.test(n = input$N,
                                           d = effect_size,
@@ -241,6 +240,7 @@ server <- function(input, output, session) {
                         pwr.t.test(d = effect_size,
                                    sig.level = input$alpha,
                                    power = input$power,
+                                   type = "one.sample",
                                    alternative = alternative[[two_sided]])[["n"]],
                         pwr.norm.test(d = effect_size,
                                       sig.level = input$alpha,
@@ -321,6 +321,7 @@ server <- function(input, output, session) {
                             pwr.t.test(n = input$N,
                                        d = effect_size,
                                        sig.level = input$alpha,
+                                       type = "one.sample",
                                        alternative = alternative[[two_sided]])[["power"]],
                             pwr.norm.test(n = input$N,
                                           d = effect_size,
@@ -332,6 +333,7 @@ server <- function(input, output, session) {
                         pwr.t.test(d = effect_size,
                                    sig.level = input$alpha,
                                    power = input$power,
+                                   type = "one.sample",
                                    alternative = alternative[[two_sided]])[["n"]],
                         pwr.norm.test(d = effect_size,
                                       sig.level = input$alpha,

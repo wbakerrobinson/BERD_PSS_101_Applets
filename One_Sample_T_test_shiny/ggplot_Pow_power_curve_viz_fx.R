@@ -12,12 +12,12 @@ Pow_alpha_pow_curve_t <- function(N, effect_size, alpha, user_power, side)
     power_data <- tibble(power = rep.int(seq(0.50, ifelse(user_power < 0.95, user_power + 0.05, 0.99), 0.01), 3)) %>%
       arrange(power) %>%
       mutate(alpha_level = rep.int(alpha_presets, length(power)/3),
-             N = map2_dbl(power, alpha_level, ~ceiling(pwr.t.test(power = .x, sig.level = .y, d = effect_size, alternative = side)[["n"]])))
+             N = map2_dbl(power, alpha_level, ~ceiling(pwr.t.test(power = .x, sig.level = .y, d = effect_size, type = "one.sample", alternative = side)[["n"]])))
   }else{
     power_data <- tibble(power = rep.int(seq(0.50, ifelse(user_power < 0.95, user_power + 0.05, user_power), 0.01), 4)) %>%
       arrange(power) %>%
       mutate(alpha_level = rep.int(c(0.01, 0.05, 0.10, alpha), length(power)/4),
-             N = map2_dbl(power, alpha_level, ~ceiling(pwr.t.test(power = .x, sig.level = .y, d = effect_size, alternative = side)[["n"]])))
+             N = map2_dbl(power, alpha_level, ~ceiling(pwr.t.test(power = .x, sig.level = .y, d = effect_size, type = "one.sample", alternative = side)[["n"]])))
   }
   
   power_data_non_user <- power_data %>%
@@ -137,12 +137,12 @@ Pow_effect_pow_curve_t <- function(N, effect_size, alpha, user_power, side)
     power_data <- tibble(power = rep.int(seq(0.50, ifelse(user_power < 0.95, user_power + 0.05, 0.99), 0.01), 3)) %>%
       arrange(power) %>%
       mutate(effect_val = rep.int(std_effect, length(power)/3),
-             N = map2_dbl(power, effect_val, ~ceiling(pwr.t.test(power = .x, sig.level = alpha, d = .y, alternative = side)[["n"]])))
+             N = map2_dbl(power, effect_val, ~ceiling(pwr.t.test(power = .x, sig.level = alpha, type = "one.sample", d = .y, alternative = side)[["n"]])))
   }else{
     power_data <- tibble(power = rep.int(seq(0.50, ifelse(user_power < 0.95, user_power + 0.05, user_power), 0.01), 4)) %>%
       arrange(power) %>%
       mutate(effect_val = rep.int(c(0.2, 0.5, 0.8, effect_size), length(power)/4),
-             N = map2_dbl(power, effect_val, ~ceiling(pwr.t.test(power = .x, sig.level = alpha, d = .y, alternative = side)[["n"]])))
+             N = map2_dbl(power, effect_val, ~ceiling(pwr.t.test(power = .x, sig.level = alpha, type = "one.sample", d = .y, alternative = side)[["n"]])))
   }
 
   power_data_non_user <- power_data %>%
