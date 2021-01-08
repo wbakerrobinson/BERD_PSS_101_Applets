@@ -61,8 +61,8 @@ Pow_alpha_pow_curve_t <- function(N, effect_size, alpha, user_power, side)
     labs(x = "Sample Size",
          y = "Power",
          title = "Power Curve: 1 sample T-test by alpha level",
-         subtitle = "User specified alpha in orange with (N, power) in blue") +
-    theme(legend.position="none") +
+         caption = "Orange power curve based on user specified parameters, with blue triangle indicating the intersection of specified power and resulting sample size.") +
+    theme(legend.position="none", plot.caption = element_text(hjust = 0)) +
     coord_cartesian(ylim = c(0.45, 1))
 }
 
@@ -123,8 +123,8 @@ Pow_alpha_pow_curve_z <- function(N, effect_size, alpha, user_power, side)
     labs(x = "Sample Size",
          y = "Power",
          title = "Power Curve: 1 sample Z-test by alpha level",
-         subtitle = "User specified alpha in orange with (N, power) in blue") +
-    theme(legend.position="none") +
+         caption = "Orange power curve based on user specified parameters, with blue triangle indicating the intersection of specified power and resulting sample size.") +
+    theme(legend.position="none", plot.caption = element_text(hjust = 0)) +
     coord_cartesian(ylim = c(0.45, 1))
 }
 
@@ -186,8 +186,8 @@ Pow_effect_pow_curve_t <- function(N, effect_size, alpha, user_power, side)
     labs(x = "Sample Size",
          y = "Power",
          title = "Power Curve: 1 sample T-test by effect size",
-         subtitle = "User specified effect size in orange with (N, power) in blue") +
-    theme(legend.position="none") +
+         caption = "Orange power curve based on user specified parameters, with blue triangle indicating the intersection of specified power and resulting sample size.") +
+    theme(legend.position="none", plot.caption = element_text(hjust = 0)) +
     coord_cartesian(ylim = c(0.45, 1))
 }
 
@@ -249,8 +249,8 @@ Pow_effect_pow_curve_z <- function(N, effect_size, alpha, user_power, side)
     labs(x = "Sample Size",
          y = "Power",
          title = "Power Curve: 1 sample Z-test by effect size",
-         subtitle = "User specified effect size in orange with (N, power) in blue") +
-    theme(legend.position="none") +
+         caption = "Orange power curve based on user specified parameters, with blue triangle indicating the intersection of specified power and resulting sample size.") +
+    theme(legend.position="none", plot.caption = element_text(hjust = 0)) +
     coord_cartesian(ylim = c(0.45, 1))
 }
 

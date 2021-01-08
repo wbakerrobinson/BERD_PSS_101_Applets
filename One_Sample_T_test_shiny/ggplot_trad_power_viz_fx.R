@@ -110,7 +110,7 @@ one_sided_t <- function(data, test_stat, color)
 two_sided_z_h0_leq <- function(data, mu0, muA, test_stat, neg_test_stat, color)
 {
   max_h0 <- max(data$pdf_h0)
-  label_height <- ifelse(max_h0 < 0.25, max_h0 + 0.008, 0.25)
+  label_height <- ifelse(max_h0 < 0.227, max_h0 + 0.023, 0.25)
   plot_size <- 18
   text_size <- 5
   
@@ -153,20 +153,20 @@ two_sided_z_h0_leq <- function(data, mu0, muA, test_stat, neg_test_stat, color)
     geom_segment(aes(x = neg_test_stat, 
                      y = 0, 
                      xend = neg_test_stat, 
-                     yend = label_height - 0.008),
+                     yend = label_height - 0.007),
                  alpha = 0.7,
                  color = "#999999") + 
     geom_segment(aes(x = test_stat, 
                      y = 0,
                      xend = test_stat, 
-                     yend = label_height - 0.008), 
+                     yend = label_height - 0.007), 
                  alpha = 0.7,
                  color = "#999999") + 
     labs(x = "Mean Values",
          y = "",
          title = "Traditional Power Visualization: 1 Sample Z-test") +
-    annotate("text", x = mu0, y = label_height, label = glue("H0"), size = text_size) +
-    annotate("text", x = muA, y = label_height, label = glue("HA"), size = text_size) +
+    annotate("text", x = mu0, y = label_height - 0.016, label = glue("H0"), size = text_size) +
+    annotate("text", x = muA, y = label_height - 0.016, label = glue("HA"), size = text_size) +
     annotate("text", x = neg_test_stat, y = label_height, label = glue("-Critical Value"), size = text_size) +
     annotate("text", x = test_stat, y = label_height, label = glue("+Critical Value"), size = text_size) +
     theme_bw(base_size = plot_size) +
@@ -178,7 +178,7 @@ two_sided_z_h0_leq <- function(data, mu0, muA, test_stat, neg_test_stat, color)
 one_sided_z_h0_leq <- function(data, mu0, muA, test_stat, color)
 {
   max_h0 <- max(data$pdf_h0)
-  label_height <- ifelse(max_h0 < 0.25, max_h0 + 0.008, 0.25)
+  label_height <- ifelse(max_h0 < 0.227, max_h0 + 0.023, 0.25)
   text_size <- 5
   plot_size <- 18
   
@@ -207,14 +207,14 @@ one_sided_z_h0_leq <- function(data, mu0, muA, test_stat, color)
     geom_segment(aes(x = test_stat, 
                      y = 0,
                      xend = test_stat, 
-                     yend = label_height - 0.008), 
+                     yend = label_height - 0.007), 
                  alpha = 0.7,
                  color = "#999999") + 
     labs(x = "Mean Values",
          y = "",
          title = "Traditional Power Visualization: 1 Sample Z-test") +
-    annotate("text", x = mu0, y = label_height, label = glue("H0"), size = text_size) +
-    annotate("text", x = muA, y = label_height, label = glue("HA"), size = text_size) +
+    annotate("text", x = mu0, y = label_height - 0.016, label = glue("H0"), size = text_size) +
+    annotate("text", x = muA, y = label_height - 0.016, label = glue("HA"), size = text_size) +
     annotate("text", x = test_stat, y = label_height, label = glue("Critical Value"), size = text_size) +
     theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
@@ -225,7 +225,7 @@ one_sided_z_h0_leq <- function(data, mu0, muA, test_stat, color)
 two_sided_z_h0_greater <- function(data, mu0, muA, test_stat, neg_test_stat, color)
 {
   max_h0 <- max(data$pdf_h0)
-  label_height <- ifelse(max_h0 < 0.25, max_h0 + 0.008, 0.25)
+  label_height <- ifelse(max_h0 < 0.227, max_h0 + 0.023, 0.25)
   plot_size <- 18
   text_size <- 5
   
@@ -268,20 +268,20 @@ two_sided_z_h0_greater <- function(data, mu0, muA, test_stat, neg_test_stat, col
     geom_segment(aes(x = neg_test_stat, 
                      y = 0, 
                      xend = neg_test_stat, 
-                     yend = label_height - 0.008),
+                     yend = label_height - 0.007),
                  alpha = 0.7,
                  color = "#999999") + 
     geom_segment(aes(x = test_stat, 
                      y = 0,
                      xend = test_stat, 
-                     yend = label_height - 0.008), 
+                     yend = label_height - 0.007), 
                  alpha = 0.7,
                  color = "#999999") + 
     labs(x = "Mean Values",
          y = "",
          title = "Traditional Power Visualization: 1 Sample Z-test") +
-    annotate("text", x = mu0, y = label_height, label = glue("H0"), size = text_size) +
-    annotate("text", x = muA, y = label_height, label = glue("HA"), size = text_size) +
+    annotate("text", x = mu0, y = label_height - 0.016, label = glue("H0"), size = text_size) +
+    annotate("text", x = muA, y = label_height - 0.016, label = glue("HA"), size = text_size) +
     annotate("text", x = neg_test_stat, y = label_height, label = glue("-Critical Value"), size = text_size) +
     annotate("text", x = test_stat, y = label_height, label = glue("+Critical Value"), size = text_size) +
     theme_bw(base_size = plot_size) +
@@ -293,7 +293,7 @@ two_sided_z_h0_greater <- function(data, mu0, muA, test_stat, neg_test_stat, col
 one_sided_z_h0_greater <- function(data, mu0, muA, neg_test_stat, color)
 {
   max_h0 <- max(data$pdf_h0)
-  label_height <- ifelse(max_h0 < 0.25, max_h0 + 0.008, 0.25)
+  label_height <- ifelse(max_h0 < 0.227, max_h0 + 0.023, 0.25)
   plot_size <- 18
   text_size <- 5
   
@@ -318,7 +318,7 @@ one_sided_z_h0_greater <- function(data, mu0, muA, neg_test_stat, color)
                               ymax = ifelse(pdf_hA < pdf_h0, pdf_h0, pdf_hA),
                               x = x_val,
                               fill = "Power")) +
-    geom_line(data %>% filter(!(pdf_h0 < 0.001)),
+    geom_line(data %>% filter(!(pdf_h0 < 0.007)),
               mapping = aes(x = x_val,
                             y = pdf_h0),
               color = "#999999",
@@ -326,14 +326,14 @@ one_sided_z_h0_greater <- function(data, mu0, muA, neg_test_stat, color)
     geom_segment(aes(x = neg_test_stat, 
                      y = 0, 
                      xend = neg_test_stat, 
-                     yend = label_height - 0.008),
+                     yend = label_height - 0.007),
                  alpha = 0.7,
                  color = "#999999") + 
     labs(x = "Mean Values",
          y = "",
          title = "Traditional Power Visualization: 1 Sample Z-test") +
-    annotate("text", x = mu0, y = label_height, label = glue("H0"), size = text_size) +
-    annotate("text", x = muA, y = label_height, label = glue("HA"), size = text_size) +
+    annotate("text", x = mu0, y = label_height - 0.016, label = glue("H0"), size = text_size) +
+    annotate("text", x = muA, y = label_height - 0.016, label = glue("HA"), size = text_size) +
     annotate("text", x = neg_test_stat, y = label_height, label = glue("Critical Value"), size = text_size) +
     theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +

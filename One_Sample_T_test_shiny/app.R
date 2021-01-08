@@ -36,6 +36,9 @@ ui <- fluidPage(
                ".shiny-output-error:before { visibility: hidden; }"
     ),
     
+    tags$head(tags$style("#PSS_calc{color: #E69F00;}" 
+    )),
+    
     # Sidebar with drop down for conditional params based on what to calc
     sidebarPanel(fluid = TRUE,
                  width = 3,
@@ -102,7 +105,6 @@ ui <- fluidPage(
                                                inline = TRUE,
                                                selected = 2))),
 
-    # Plots and maybe power etc. Want to tab set?
     mainPanel(
         h3(htmlOutput("header")),
         tabsetPanel(id = "main_tab",
@@ -166,6 +168,7 @@ server <- function(input, output, session) {
                                       sig.level = input$alpha,
                                       power = input$power,
                                       alternative = alternative[[two_sided]])[["n"]])
+            N <- ceiling(N)
             power <- input$power
         }
         # Critical value
@@ -199,15 +202,15 @@ server <- function(input, output, session) {
         distribution <- paste('Distribution:', ifelse(input$sd_known == FALSE, 'Student\'s t', 'Normal'))
         effect_size <- paste("Effect Size:", round(user_effect, 3))
         power_output <- paste("Power:", round(power, 3))
-        N_output <- paste("Sample Size:", ceiling(N))
+        N_output <- paste("Sample Size:", N)
         
         # Add DF if T distr
         if(input$sd_known == FALSE)
         {
             df <- paste("Degrees of Freedom:", N - 1)
-            return_HTML <- HTML(paste(distribution, df, crit_output, effect_size, power_output, N_output, sep = '<br/>'))
+            return_HTML <- HTML(paste(distribution, df, crit_output, effect_size, ifelse(as.numeric(input$which_calc) == 1, N_output, power_output), div(id = "PSS_calc", ifelse(as.numeric(input$which_calc) == 1, power_output, N_output)), sep = '<br/>'))
         }else{
-            return_HTML <- HTML(paste(distribution, crit_output, effect_size, power_output, N_output, sep = '<br/>'))
+            return_HTML <- HTML(paste(distribution, crit_output, effect_size, ifelse(as.numeric(input$which_calc) == 1, N_output, power_output), div(id = "PSS_calc", ifelse(as.numeric(input$which_calc) == 1, power_output, N_output)), sep = '<br/>'))
         }
         return(return_HTML)
     })
