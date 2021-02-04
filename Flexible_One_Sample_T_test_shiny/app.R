@@ -12,7 +12,7 @@ library(glue)
 library(purrr)
 
 # Source files for app
-source("ggplot_trad_power_viz_fx.R", local = TRUE)
+source("ggplot_trad_power_viz_fx_final.R", local = TRUE)
 source("ggplot_N_power_curve_viz_fx.R", local = TRUE)
 source("ggplot_Pow_power_curve_viz_fx.R", local = TRUE)
 
@@ -316,17 +316,38 @@ server <- function(input, output, session) {
             # T distribution
             df <- N - 1
             test_stat <- qt(1 - input$alpha / two_sided, df = df)
-            ncp <- abs(input$muA - input$mu0) * sqrt(N)/input$sd
-            data <- tibble(x_val = seq(from = -3.5*(df/(df-2)),
-                                       to = ncp + ifelse(ncp > 4, ncp + 1, 3.5)*(df/(df-2)),
-                                       by = 0.01),
-                           pdf_h0 = dt(x_val, df),
-                           pdf_hA = dt(x_val, df, ncp)) %>%
-                filter(!(x_val < 0 & pdf_h0 < 0.001) & !(x_val > ncp & pdf_hA < 0.001))
-            if(two_sided == 2) {
-                two_sided_t(data, test_stat, color)
-            } else{
-                one_sided_t(data, test_stat, color)
+            ncp <- (input$muA - input$mu0) * sqrt(N)/input$sd
+            
+            # mu0 <= muA
+            if(input$mu0 <= input$muA){
+                lower_seq <- -3.5*(df/(df-2))
+                upper_seq <- ncp + ifelse(ncp > 4, ncp + 1, 3.5)*(df/(df-2))
+                data <- tibble(x_val = seq(from = lower_seq,
+                                           to = upper_seq,
+                                           by = 0.01),
+                               pdf_h0 = dt(x_val, df),
+                               pdf_hA = dt(x_val, df, ncp)) %>%
+                    filter(!(x_val < 0 & pdf_h0 < 0.001) & !(x_val > ncp & pdf_hA < 0.001))
+                if(two_sided == 2){
+                    two_sided_t_h0_leq(data, test_stat, color)
+                } else{
+                    one_sided_t_h0_leq(data, test_stat, color)
+                }
+            } else {
+                # mu0 > muA
+                lower_seq <- ncp - ifelse(ncp > 4, -ncp + 1, 3.5)*(df/(df-2))
+                upper_seq <- 3.5*(df/(df-2))
+                data <- tibble(x_val = seq(from = lower_seq,
+                                           to = upper_seq,
+                                           by = 0.01),
+                               pdf_h0 = dt(x_val, df),
+                               pdf_hA = dt(x_val, df, ncp)) %>%
+                    filter(!(x_val > 0 & pdf_h0 < 0.001) & !(x_val < ncp & pdf_hA < 0.001))
+                if(two_sided == 2){
+                    two_sided_t_h0_greater(data, test_stat, color)
+                } else{
+                    one_sided_t_h0_greater(data, -test_stat, color)
+                }
             }
         }
         else{
