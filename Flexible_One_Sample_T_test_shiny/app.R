@@ -126,7 +126,7 @@ ui <- fluidPage(
                                "for more details. The source code for this app can also be found",
                                tags$a(href = "https://github.com/wbakerrobinson/PSS_Applets_BERD/tree/main/One_Sample_T_test_shiny", "here."),
                                "There is also a supplementary rmarkdown file (",
-                               tags$a(href = "", "here"),
+                               tags$a(href = "https://berd-pss101-example-rcode.netlify.app/", "here"),
                                ") to go along with the BERD Power and Sample Size 101 Workshop examples,
                                which shows how to perform these calculations using the base stats package in R."),
                              h4("Overview of App Options"),
