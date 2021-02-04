@@ -4,7 +4,7 @@
 
 OCTRI-BERD Power and Sample Size 101 presented 2/04/21  
 Meike Niederhausen, PhD  
-Slides: [link coming soon]()  
+Slides: link coming soon    
 The OCTRI-BERD website has more information about this seminar [here](https://www.ohsu.edu/octri/octri-berd-research-forum-power-and-sample-size-101).
 
 ## Shiny apps
