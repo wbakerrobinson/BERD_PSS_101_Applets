@@ -1,7 +1,7 @@
 # One-Sample T test app
 # Will Baker-Robinson
 # BSTA 500 -BERD PSS Seminar
-# Simplified Version meant for teaching demos
+# Paired Version
 # This file stores the ggplot functions required for the traditional power viz
 
 # Functions that return ggplot obj for output$power_viz
