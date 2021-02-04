@@ -19,4 +19,6 @@ A note on the apps: Every effort was made to test all possible combinations of p
 
 Rmarkdown file with code for all sample problems from the seminar: [link](https://berd-pss101-example-rcode.netlify.app)
 
+***
+
 Reach out to bakerrob@ohsu.edu with questions or feedback
