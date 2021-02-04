@@ -26,7 +26,7 @@ ui <- fluidPage(
     
     # Title
     titlePanel("One Sample Z and T-test Power and Sample Size Calculator"),
-    
+    withMathJax(),
     tags$head(
         tags$style(HTML("hr {border-top: 1px solid #000000;}"))
     ),
@@ -38,6 +38,8 @@ ui <- fluidPage(
     
     tags$head(tags$style("#PSS_calc{color: #E69F00;}" 
     )),
+    tags$head(tags$style("#about_p{font-size: 18px;}")),
+    tags$script("MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']], processEscapes: true}});"),
     
     # Sidebar with drop down for conditional params based on what to calc
     sidebarPanel(fluid = TRUE,
@@ -111,6 +113,59 @@ ui <- fluidPage(
                     type = "tabs",
                     tabPanel("Power Visualization", plotOutput("power_viz", width = "100%")),
                     tabPanel("Power Curve", plotOutput("pow_curve"), width = "100%"),
+                    tabPanel("About",
+                             width = "100%",
+                             tags$br(),
+                             div(id = "about_p", p("This app calculates power and sample size for a one-sample Z and T-test. 
+        It was designed to give learners an intuitive understanding of these calculations by 
+        visualizing the way changes in parameters yield different power curves and distributions.")),
+                             p(h4("Calculations"),
+                               "Power and sample size was calculated using the R library pwr. Specificially the functions pwr.norm.test, and pwr.t.test
+                               were used. Please see the pwr package's",
+                               tags$a(href = "https://cran.r-project.org/web/packages/pwr/pwr.pdf", "reference"),
+                               "for more details. The source code for this app can also be found",
+                               tags$a(href = "https://github.com/wbakerrobinson/PSS_Applets_BERD/tree/main/One_Sample_T_test_shiny", "here."),
+                               "There is also a supplementary rmarkdown file (",
+                               tags$a(href = "", "here"),
+                               ") to go along with the BERD Power and Sample Size 101 Workshop examples,
+                               which shows how to perform these calculations using the base stats package in R."),
+                             h4("Overview of App Options"),
+                             p(h5("Hypothesis:"),
+                               "Two-sided: $H_0: \\mu = \\mu_0$ vs. $H_A: \\mu \\ne \\mu_0$",
+                               tags$br(),
+                               "One-sided: $H_0: \\mu = \\mu_0$ vs. $H_A: \\mu < \\mu_0$",
+                               "  or  ",
+                               "$H_0: \\mu = \\mu_0$ vs. $H_A: \\mu > \\mu_0$",
+                               tags$br(),
+                               "For the one-sided hypothesis the app selects the inequality depending on the user
+                               specified values of the mean for the null and alternative distribution. That is, if the 
+                               mean of $H_A$ is greater than $H_0$, the app selects the alternative hypothesis $\\mu > \\mu_0$."),
+                             p(h5("Mean $H_0$ and $H_A$:"), "The population mean under the null hypothesis,
+                               and the population mean for which the power and sample size are calculated."),
+                             p(h5("Standard Deviation:"), "The best estimate of population standard deviation."),
+                             p(h5("Standard Deviation Assumption:"),
+                               "Known: This calculates the power or sample size using a normal distribution. This is an unrealistic
+                               assumption to make in most real-world situations. It is included here for learning purposes.",
+                               tags$br(),
+                               "Unknown: This calculates the power or sample size using a Student's T distribution. You may notice that
+                               the distribution of HA is not symmetric, this is because it follows the non-central T distribution."),
+                             p(h5("Power:"), "This is an option when the user has selected to calculate sample size. Power is the 
+                               probability that we reject the null hypothesis, when the null hypothesis is false."),
+                             p(h5("Sample Size:"), "This an option when the user has selected to calculate power. 
+                               Sample size is the estimated number of participants we will have in our data."),
+                             p(h5("Alpha:"), "The type one error rate, or the probability of a false positive. 
+                               We choose a small alpha level to ensure a low probability of rejecting the null hypothesis when it is in fact true."),
+                             p(h5("Power Curve Options:"),
+                               "Alpha: The power curves corresponding to common alpha values of 0.01, 0.05, and 0.10 are shown, as well as the user
+                               input value if it is not one of these.",
+                               tags$br(),
+                               "Effect Size: The power curves corresponding to the effect sizes of 0.2, 0.5, 0.8 are shown, as well as the user input
+                               value if it is not one of thse. Effect sizes were chosen based on Cohen's rule of thumb where an effect of 0.2 is considered
+                               small, 0.5 is considered a moderate effect, and 0.8 is considered a large effect."),
+                             tags$hr(),
+                             p("Created by Will Baker-Robinson with feedback from Meike Niederhausen, Yiyi Chen, and Alicia Johnson."),
+                             p("Email bakerrob@ohsu.edu with questions or feedback.")
+                    ),
                     selected = "Power Visualization")
     )
 )
