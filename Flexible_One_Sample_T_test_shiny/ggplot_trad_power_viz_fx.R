@@ -1,7 +1,7 @@
 # One-Sample T test app
 # Will Baker-Robinson
 # BSTA 500 -BERD PSS Seminar
-# Simplified Version meant for teaching demos
+# Flexible version to allow for calculation of most values
 # This file stores the ggplot functions required for the traditional power viz
 
 # Functions that return ggplot obj for output$power_viz
@@ -171,8 +171,7 @@ two_sided_z_h0_leq <- function(data, mu0, muA, test_stat, neg_test_stat, color)
     annotate("text", x = test_stat, y = label_height, label = glue("+Critical Value"), size = text_size) +
     theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
-    theme(legend.position="bottom") +
-    coord_cartesian(xlim = c(20, 60), ylim = c(0, 0.25))
+    theme(legend.position="bottom")
 }
 
 one_sided_z_h0_leq <- function(data, mu0, muA, test_stat, color)
@@ -218,8 +217,7 @@ one_sided_z_h0_leq <- function(data, mu0, muA, test_stat, color)
     annotate("text", x = test_stat, y = label_height, label = glue("Critical Value"), size = text_size) +
     theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
-    theme(legend.position="bottom") +
-    coord_cartesian(xlim = c(20, 60), ylim = c(0, 0.25))
+    theme(legend.position="bottom")
 }
 
 two_sided_z_h0_greater <- function(data, mu0, muA, test_stat, neg_test_stat, color)
@@ -286,8 +284,7 @@ two_sided_z_h0_greater <- function(data, mu0, muA, test_stat, neg_test_stat, col
     annotate("text", x = test_stat, y = label_height, label = glue("+Critical Value"), size = text_size) +
     theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
-    theme(legend.position="bottom") +
-    coord_cartesian(xlim = c(20, 60), ylim = c(0, 0.25))
+    theme(legend.position="bottom")
 }
 
 one_sided_z_h0_greater <- function(data, mu0, muA, neg_test_stat, color)
@@ -337,11 +334,10 @@ one_sided_z_h0_greater <- function(data, mu0, muA, neg_test_stat, color)
     annotate("text", x = neg_test_stat, y = label_height, label = glue("Critical Value"), size = text_size) +
     theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
-    theme(legend.position="bottom") +
-    coord_cartesian(xlim = c(20, 60), ylim = c(0, 0.25))
+    theme(legend.position="bottom")
 }
 
-# ---------------------------------------- CODE BELOW IS FOR TESTING PURPOSES | Just >= T --------------------------------------------
+# ---------------------------------------- CODE BELOW IS FOR TESTING PURPOSES--------------------------------------------
 # color <- c("Type I Error (alpha)" = "#E69F00",
 #            "Type II Error (Beta)" = "#F0E442",
 #            "Power" = "#0072B2",

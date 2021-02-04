@@ -1,0 +1,246 @@
+---
+title: "BERD Power and Sample Size 101 - Example R code"
+author: "Will Baker-Robinson"
+date: "2/04/2021"
+output:
+ html_document:
+    theme: lumen
+    toc: yes
+    toc_float:
+      collapsed: yes
+      smooth_scroll: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This file was created to accompany the BERD PSS 101 workshop. It contains all the power and sample size examples from the seminar calculated using the base stats package in R. If you have any questions about the functions used to calculate power and sample size, make sure to check the R documentation.  
+For an interactive version of example 1 checkout this [shiny app](https://wbakerrobinson.shinyapps.io/Paired_T_test_shiny/).
+
+## Example 1: Paired T-test Sample Size Calculation
+
+### sd = 25.6
+
+Hypotheses: $H_0: \mu_d = 0$ vs. $H_A: \mu_d \ne 0$  
+__$\sigma = 25.6$__   
+$\Delta = 46.5 - 34 = 12.5$  
+$\alpha = 0.05$   
+Power = $1 - \beta = 0.80$  
+
+```{r}
+# Uncomment and run the line below to see the R documentation
+# ?power.t.test()
+# Note that with a change in the type argument this function can be used for one sample, two sample, and paired t-tests.
+
+# Calculate the Sample Size
+(paired_t_calc1 <- power.t.test(delta = 46.5 - 34,
+                                sd = 25.6,
+                                sig.level = 0.05,
+                                power = 0.80,
+                                type = "paired",
+                                alternative = "two.sided"))
+
+# Extract the sample size and find the smallest integer not less than the calculated value
+(N_paired_t_calc1 <- ceiling(paired_t_calc1[["n"]]))
+```
+
+### sd = 20.4
+
+Hypotheses: $H_0: \mu_d = 0$ vs. $H_A: \mu_d \ne 0$  
+__$\sigma = 20.4$__   
+$\Delta = 46.5 - 34 = 12.5$  
+$\alpha = 0.05$   
+Power = $1 - \beta = 0.80$ 
+
+```{r}
+(paired_t_calc2 <- power.t.test(delta = 46.5 - 34,
+                                sd = 20.4,
+                                sig.level = 0.05,
+                                power = 0.80,
+                                type = "paired",
+                                alternative = "two.sided"))
+
+(N_paired_t_calc2 <- ceiling(paired_t_calc2[["n"]]))
+```
+
+### sd = 13.2
+
+Hypotheses: $H_0: \mu_d = 0$ vs. $H_A: \mu_d \ne 0$  
+__$\sigma = 13.2$__   
+$\Delta = 46.5 - 34 = 12.5$  
+$\alpha = 0.05$   
+Power = $1 - \beta = 0.80$ 
+
+```{r}
+(paired_t_calc3 <- power.t.test(delta = 46.5 - 34,
+                                sd = 13.2,
+                                sig.level = 0.05,
+                                power = 0.80,
+                                type = "paired",
+                                alternative = "two.sided"))
+
+(N_paired_t_calc3 <- ceiling(paired_t_calc3[["n"]]))
+```
+
+## Example 2: Two Sample T-test Sample Size Calculation
+
+### Difference = 5
+
+Hypotheses: $H_0: \mu_1 - \mu_2 = 0$ vs. $H_A: \mu_1 - \mu_2 \ne 0$  
+$\mu_1 = 25$   
+$\mu_2 = 30$  
+__$\Delta = \mu_1 - \mu_0 = -5$__   
+$\sigma = 22.6$ assuming that $\sigma_1 = \sigma_2 = \sigma$   
+$\alpha = 0.05$   
+Power = $1 - \beta = 0.80$  
+
+```{r}
+(two_sample_t_calc1 <- power.t.test(delta = -5,
+                                    sd = 22.6,
+                                    sig.level = 0.05,
+                                    power = 0.80,
+                                    type = "two.sample",
+                                    alternative = "two.sided"))
+
+(N_per_group_calc1 <- ceiling(two_sample_t_calc1[["n"]]))
+
+# Calculate the total sample size
+(N_total_calc1 <- N_per_group_calc1*2)
+```
+
+### Difference = 8
+
+Hypotheses: $H_0: \mu_1 - \mu_2 = 0$ vs. $H_A: \mu_1 - \mu_2 \ne 0$  
+$\mu_1 = 22$   
+$\mu_2 = 30$  
+__$\Delta = \mu_1 - \mu_2 = -8$__   
+$\sigma = 22.6$ assuming that $\sigma_1 = \sigma_2 = \sigma$   
+$\alpha = 0.05$   
+Power = $1 - \beta = 0.80$  
+
+```{r}
+(two_sample_t_calc2 <- power.t.test(delta = -8,
+                                    sd = 22.6,
+                                    sig.level = 0.05,
+                                    power = 0.80,
+                                    type = "two.sample",
+                                    alternative = "two.sided"))
+
+(N_per_group_calc2 <- ceiling(two_sample_t_calc2[["n"]]))
+
+# Calculate the total sample size
+(N_total_calc2 <- N_per_group_calc2*2)
+```
+
+### Difference = 10
+
+Hypotheses: $H_0: \mu_1 - \mu_2 = 0$ vs. $H_A: \mu_1 - \mu_2 \ne 0$  
+$\mu_1 = 20$   
+$\mu_2 = 30$  
+__$\Delta = \mu_1 - \mu_2 = -10$__   
+$\sigma = 22.6$ assuming that $\sigma_1 = \sigma_2 = \sigma$   
+$\alpha = 0.05$   
+Power = $1 - \beta = 0.80$  
+
+```{r}
+(two_sample_t_calc3 <- power.t.test(delta = -10,
+                                    sd = 22.6,
+                                    sig.level = 0.05,
+                                    power = 0.80,
+                                    type = "two.sample",
+                                    alternative = "two.sided"))
+
+(N_per_group_calc3 <- ceiling(two_sample_t_calc3[["n"]]))
+
+# Calculate the total sample size
+(N_total_calc3 <- N_per_group_calc3*2)
+```
+
+## Example 3: Chi-Square Effect Size Calculation
+
+### Control proportion = 0.10
+
+Hypotheses: $H_0: p_1 - p_2 = 0$ vs. $H_A: p_1 - p_2 \ne 0$  
+__$p_1 = 0.10$__   
+$\alpha = 0.05$   
+Power = $1 - \beta = 0.80$  
+N total = 164  
+Sample Size Per Group: $N_1 = N_2 = 82$  
+
+```{r}
+# Uncomment and run the line below to see the R documentation
+# ?power.prop.test()
+
+# Entered 0.10 in p2, because we want to find the proportion in the lower direction
+# If you want to find proportion in the upper direction enter the control proportion in p1
+(chi_square_calc1 <- power.prop.test(n = 82,
+                                     p2 = 0.10,
+                                     sig.level = 0.05,
+                                     power = 0.80,
+                                     alternative = "two.sided"))
+
+
+# Estimated experimental group proportion
+# If you entered the control in p2 then the estimated prop is stored in p1
+# It is the opposite if you enter the control proportion in p1
+(experimental_prop_calc1 <- round(chi_square_calc1[["p1"]], 5))
+
+# Calculate the difference in proportions
+(delta_prop_calc1 <- experimental_prop_calc1 - 0.10)
+```
+
+### Control proportion = 0.30
+
+Hypotheses: $H_0: p_1 = p_2$ vs. $H_A: p_1 \ne p_2$  
+__$p_1 = 0.30$__   
+$\alpha = 0.05$   
+Power = $1 - \beta = 0.80$  
+N total = 164  
+Sample Size Per Group: $N_1 = N_2 = 82$  
+
+```{r}
+# Entered 0.30 in p2, because we want to find the proportion in the lower direction
+# If you want to find proportion in the upper direction enter the control proportion in p1
+(chi_square_calc2 <- power.prop.test(n = 82,
+                                     p2 = 0.30,
+                                     sig.level = 0.05,
+                                     power = 0.80,
+                                     alternative = "two.sided"))
+
+# Estimated experimental group proportion
+# If you entered the control in p2 then the estimated prop is stored in p1
+# It is the opposite if you enter the control proportion in p1
+(experimental_prop_calc2 <- round(chi_square_calc2[["p1"]], 5))
+
+# Calculate the difference in propotions
+(delta_prop_calc2 <- experimental_prop_calc2 - 0.30)
+```
+
+### Control proportion = 0.50
+
+Hypotheses: $H_0: p_1 = p_2$ vs. $H_A: p_1 \ne p_2$  
+__$p_1 = 0.50$__   
+$\alpha = 0.05$   
+Power = $1 - \beta = 0.80$  
+N total = 164  
+Sample Size Per Group: $N_1 = N_2 = 82$  
+
+```{r}
+# Entered 0.50 in p2, because we want to find the proportion in the lower direction
+# If you want to find proportion in the upper direction enter the control proportion in p1
+(chi_square_calc3 <- power.prop.test(n = 82,
+                                     p2 = 0.50,
+                                     sig.level = 0.05,
+                                     power = 0.80,
+                                     alternative = "two.sided"))
+
+# Estimated experimental group proportion
+# If you entered the control in p2 then the estimated prop is stored in p1
+# It is the opposite if you enter the control proportion in p1
+(experimental_prop_calc3 <- round(chi_square_calc3[["p1"]], 5))
+
+# Calculate the difference in proportions
+(delta_prop_calc3 <- experimental_prop_calc3 - 0.50)
+```
+

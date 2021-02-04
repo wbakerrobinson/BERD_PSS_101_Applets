@@ -1,7 +1,7 @@
 # One-Sample T test app
 # Will Baker-Robinson
 # BSTA 500 -BERD PSS Seminar
-# Simplified Version meant for teaching demos
+# Flexible version to allow for calculation of most values
 
 library(shiny)
 library(ggplot2)
@@ -12,7 +12,7 @@ library(glue)
 library(purrr)
 
 # Source files for app
-source("ggplot_trad_power_viz_fx_final.R", local = TRUE)
+source("ggplot_trad_power_viz_fx.R", local = TRUE)
 source("ggplot_N_power_curve_viz_fx.R", local = TRUE)
 source("ggplot_Pow_power_curve_viz_fx.R", local = TRUE)
 
@@ -25,8 +25,8 @@ update_geom_defaults("text", list(size = 5))
 ui <- fluidPage(
     
     # Title
-    titlePanel("One Sample Z and T-test Power and Sample Size Applet"),
-    withMathJax(),
+    titlePanel("One Sample Z and T-test Power and Sample Size Calculator"),
+    
     tags$head(
         tags$style(HTML("hr {border-top: 1px solid #000000;}"))
     ),
@@ -38,14 +38,12 @@ ui <- fluidPage(
     
     tags$head(tags$style("#PSS_calc{color: #E69F00;}" 
     )),
-    tags$head(tags$style("#about_p{font-size: 18px;}")),
-    tags$script("MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']], processEscapes: true}});"),
     
     # Sidebar with drop down for conditional params based on what to calc
     sidebarPanel(fluid = TRUE,
                  width = 3,
                  selectInput("which_calc",
-                             h3("Select one to calculate:"),
+                             h4("Select one to calculate:"),
                              choices = list("Power" = 1,
                                             "Sample Size" = 2)),
                  radioButtons("two_sided",
@@ -54,33 +52,30 @@ ui <- fluidPage(
                                              "One-sided" = 1),
                               inline = TRUE,
                               selected = 2),
-                 sliderInput("mu0",
+                 numericInput("mu0",
                               "Mean under H0:",
                              min = 30,
                              max = 50,
-                             step = 0.5,
                               value = 34),
-                 sliderInput("muA",
+                 numericInput("muA",
                               "Mean under HA:",
                               min = 30,
                               max = 50,
-                              value = 46.5,
-                              step = 0.5),
-                 sliderInput("sd",
+                              value = 46.5),
+                 numericInput("sd",
                              "Standard Deviation:",
                              min = 10, 
                              max = 30,
-                             value = 25.5,
-                             step = 0.5),
+                             value = 25.5),
                  radioButtons("sd_known",
                               "Standard Deviation Assumption:",
                               choices = list("Known" = 1,
                                              "Unknown" = 2),
                               inline = TRUE,
-                              selected = 1),
+                              selected = 2),
                  # Conditional panel for power calc
                  conditionalPanel(condition = "input.which_calc == 1",
-                                  sliderInput("N",
+                                  numericInput("N",
                                               "Sample Size:",
                                               min = 5,
                                               max = 50,
@@ -88,13 +83,13 @@ ui <- fluidPage(
                                               step = 1)),
                  # Conditional panel for N calc
                  conditionalPanel(condition = "input.which_calc == 2",
-                                  sliderInput("power",
+                                  numericInput("power",
                                               "Power:",
                                               min = 0.60,
                                               max = 0.99,
                                               value = 0.80,
                                               step = 0.01)),
-                 sliderInput("alpha",
+                 numericInput("alpha",
                              "Alpha:",
                              min = 0.01,
                              max = 0.10,
@@ -116,85 +111,37 @@ ui <- fluidPage(
                     type = "tabs",
                     tabPanel("Power Visualization", plotOutput("power_viz", width = "100%")),
                     tabPanel("Power Curve", plotOutput("pow_curve"), width = "100%"),
-                    tabPanel("About",
-                             width = "100%",
-                             tags$br(),
-                             div(id = "about_p", p("This app calculates power and sample size for a one-sample Z and T-test. 
-        It was designed to give learners an intuitive understanding of these calculations by 
-        visualizing the way changes in parameters yield different power curves and distributions.")),
-                             p(h4("Calculations"),
-                               "Power and sample size was calculated using the R library pwr. Specificially the functions pwr.norm.test, and pwr.t.test
-                               were used. Please see the pwr package's",
-                               tags$a(href = "https://cran.r-project.org/web/packages/pwr/pwr.pdf", "reference"),
-                               "for more details. The source code for this app can also be found",
-                               tags$a(href = "https://github.com/wbakerrobinson/PSS_Applets_BERD/tree/main/One_Sample_T_test_shiny", "here."),
-                               "There is also a supplementary rmarkdown file (",
-                               tags$a(href = "", "here"),
-                               ") to go along with the BERD Power and Sample Size 101 Workshop examples,
-                               which shows how to perform these calculations using the base stats package in R."),
-                             h4("Overview of App Options"),
-                             p(h5("Hypothesis:"),
-                               "Two-sided: $H_0: \\mu = \\mu_0$ vs. $H_A: \\mu \\ne \\mu_0$",
-                               tags$br(),
-                               "One-sided: $H_0: \\mu = \\mu_0$ vs. $H_A: \\mu < \\mu_0$",
-                               "  or  ",
-                               "$H_0: \\mu = \\mu_0$ vs. $H_A: \\mu > \\mu_0$",
-                               tags$br(),
-                               "For the one-sided hypothesis the app selects the inequality depending on the user
-                               specified values of the mean for the null and alternative distribution. That is, if the 
-                               mean of $H_A$ is greater than $H_0$, the app selects the alternative hypothesis $\\mu > \\mu_0$."),
-                             p(h5("Mean $H_0$ and $H_A$:"), "The population mean under the null hypothesis,
-                               and the population mean for which the power and sample size are calculated."),
-                             p(h5("Standard Deviation:"), "The best estimate of population standard deviation."),
-                             p(h5("Standard Deviation Assumption:"),
-                               "Known: This calculates the power or sample size using a normal distribution. This is an unrealistic
-                               assumption to make in most real-world situations. It is included here for learning purposes.",
-                               tags$br(),
-                               "Unknown: This calculates the power or sample size using a Student's T distribution. You may notice that
-                               the distribution of HA is not symmetric, this is because it follows the non-central T distribution."),
-                             p(h5("Power:"), "This is an option when the user has selected to calculate sample size. Power is the 
-                               probability that we reject the null hypothesis, when the null hypothesis is false."),
-                             p(h5("Sample Size:"), "This an option when the user has selected to calculate power. 
-                               Sample size is the estimated number of participants we will have in our data."),
-                             p(h5("Alpha:"), "The type one error rate, or the probability of a false positive. 
-                               We choose a small alpha level to ensure a low probability of rejecting the null hypothesis when it is in fact true."),
-                             p(h5("Power Curve Options:"),
-                               "Alpha: The power curves corresponding to common alpha values of 0.01, 0.05, and 0.10 are shown, as well as the user
-                               input value if it is not one of these.",
-                               tags$br(),
-                               "Effect Size: The power curves corresponding to the effect sizes of 0.2, 0.5, 0.8 are shown, as well as the user input
-                               value if it is not one of thse. Effect sizes were chosen based on Cohen's rule of thumb where an effect of 0.2 is considered
-                               small, 0.5 is considered a moderate effect, and 0.8 is considered a large effect."),
-                             tags$hr(),
-                             p("Created by Will Baker-Robinson with feedback from Meike Niederhausen, Yiyi Chen, and Alicia Johnson."),
-                             p("Email bakerrob@ohsu.edu with questions or feedback.")
-                             ),
                     selected = "Power Visualization")
     )
 )
 
+
+
 server <- function(input, output, session) {
     # used in determining side of pwr.func
     alternative <- c("greater", "two.sided")
-    
-    # used to change muA slider to a value 1 greater if the user sets the two equal
+   
+    # used to change the value of muA to be one unit greater if the user sets the two equal
     observe({
+        ifelse(as.numeric(input$which_calc) == 1, req(input$mu0, input$muA, input$sd, input$N), req(input$mu0, input$muA, input$sd, input$power))
         if(input$muA == input$mu0) {
-            if(input$mu0 == 50) {
-                updateSliderInput(session,
-                                  inputId = "muA",
-                                  value = input$muA - 1)
-            }else{
-                updateSliderInput(session,
-                                  inputId = "muA",
-                                  value = input$muA + 1)
-            }
+           if(input$mu0 == 50) {
+            updateSliderInput(session,
+                              inputId = "muA",
+                              value = input$muA - 1)
+           }else{
+            updateSliderInput(session,
+                              inputId = "muA",
+                              value = input$muA + 1)
+           }
         }
     })
     
     # Values displayed above plot
     output$header <- renderUI({
         # Params
+        req(input$mu0, input$muA, input$sd, input$power, input$N, input$power)
+        ifelse(as.numeric(input$which_calc) == 1, req(input$mu0, input$muA, input$sd, input$N), req(input$mu0, input$muA, input$sd, input$power))
         power <- -1
         N <- -1
         crit_output <- ''
@@ -248,8 +195,8 @@ server <- function(input, output, session) {
                 }
                 else
                 {
-                    crit_val <- qnorm(input$alpha, mean = input$mu0, sd = input$sd/sqrt(N))
-                    crit_output <- sprintf("Critical Value: %s", round(crit_val, 3))
+                   crit_val <- qnorm(input$alpha, mean = input$mu0, sd = input$sd/sqrt(N))
+                   crit_output <- sprintf("Critical Value: %s", round(crit_val, 3))
                 }
             }
         }
@@ -264,31 +211,21 @@ server <- function(input, output, session) {
         if(input$sd_known == "2")
         {
             df <- paste("Degrees of Freedom:", N - 1)
-            return_HTML <- HTML(paste(distribution, 
-                                      df, 
-                                      crit_output, 
-                                      effect_size, 
-                                      ifelse(as.numeric(input$which_calc) == 1, N_output, power_output), 
-                                      div(id = "PSS_calc", ifelse(as.numeric(input$which_calc) == 1, power_output, N_output)), 
-                                      sep = '<br/>'))
+            return_HTML <- HTML(paste(distribution, df, crit_output, effect_size, ifelse(as.numeric(input$which_calc) == 1, N_output, power_output), div(id = "PSS_calc", ifelse(as.numeric(input$which_calc) == 1, power_output, N_output)), sep = '<br/>'))
         }else{
-            return_HTML <- HTML(paste(distribution, 
-                                      crit_output, 
-                                      effect_size, 
-                                      ifelse(as.numeric(input$which_calc) == 1, N_output, power_output), 
-                                      div(id = "PSS_calc", ifelse(as.numeric(input$which_calc) == 1, power_output, N_output)), 
-                                      sep = '<br/>'))
+            return_HTML <- HTML(paste(distribution, crit_output, effect_size, ifelse(as.numeric(input$which_calc) == 1, N_output, power_output), div(id = "PSS_calc", ifelse(as.numeric(input$which_calc) == 1, power_output, N_output)), sep = '<br/>'))
         }
         return(return_HTML)
     })
-    
+
     # Trad power viz
     output$power_viz <- renderPlot({
         # All plots have same palette
+        ifelse(as.numeric(input$which_calc) == 1, req(input$mu0, input$muA, input$sd, input$N), req(input$mu0, input$muA, input$sd, input$power))
         color <- c("Type I Error (alpha)" = "#E69F00",
-                   "Type II Error (Beta)" = "#F0E442",
-                   "Power" = "#0072B2",
-                   "True Negative" = "#CCCCCC")
+                  "Type II Error (Beta)" = "#F0E442",
+                  "Power" = "#0072B2",
+                  "True Negative" = "#CCCCCC")
         power <- -1
         N <- -1
         effect_size <- abs(input$mu0 - input$muA)/input$sd
@@ -324,38 +261,17 @@ server <- function(input, output, session) {
             # T distribution
             df <- N - 1
             test_stat <- qt(1 - input$alpha / two_sided, df = df)
-            ncp <- (input$muA - input$mu0) * sqrt(N)/input$sd
-            
-            # mu0 <= muA
-            if(input$mu0 <= input$muA){
-                lower_seq <- -3.5*(df/(df-2))
-                upper_seq <- ncp + ifelse(ncp > 4, ncp + 1, 3.5)*(df/(df-2))
-                data <- tibble(x_val = seq(from = ifelse(lower_seq <= -7, -7, lower_seq),
-                                           to = ifelse(upper_seq >= 7, 7, upper_seq),
-                                           by = 0.01),
-                               pdf_h0 = dt(x_val, df),
-                               pdf_hA = dt(x_val, df, ncp)) %>%
-                    filter(!(x_val < 0 & pdf_h0 < 0.001) & !(x_val > ncp & pdf_hA < 0.001))
-                if(two_sided == 2){
-                    two_sided_t_h0_leq(data, test_stat, color)
-                } else{
-                    one_sided_t_h0_leq(data, test_stat, color)
-                }
-            } else {
-                # mu0 > muA
-                lower_seq <- ncp - ifelse(ncp > 4, -ncp + 1, 3.5)*(df/(df-2))
-                upper_seq <- 3.5*(df/(df-2))
-                data <- tibble(x_val = seq(from = ifelse(lower_seq <= -7, -7, lower_seq),
-                                           to = ifelse(upper_seq >= 7, 7, upper_seq),
-                                           by = 0.01),
-                               pdf_h0 = dt(x_val, df),
-                               pdf_hA = dt(x_val, df, ncp)) %>%
-                    filter(!(x_val > 0 & pdf_h0 < 0.001) & !(x_val < ncp & pdf_hA < 0.001))
-                if(two_sided == 2){
-                    two_sided_t_h0_greater(data, test_stat, color)
-                } else{
-                    one_sided_t_h0_greater(data, -test_stat, color)
-                }
+            ncp <- abs(input$muA - input$mu0) * sqrt(N)/input$sd
+            data <- tibble(x_val = seq(from = -3.5*(df/(df-2)),
+                                       to = ncp + ifelse(ncp > 4, ncp + 1, 3.5)*(df/(df-2)),
+                                       by = 0.01),
+                           pdf_h0 = dt(x_val, df),
+                           pdf_hA = dt(x_val, df, ncp)) %>%
+                filter(!(x_val < 0 & pdf_h0 < 0.001) & !(x_val > ncp & pdf_hA < 0.001))
+            if(two_sided == 2) {
+                two_sided_t(data, test_stat, color)
+            } else{
+                one_sided_t(data, test_stat, color)
             }
         }
         else{
@@ -364,15 +280,15 @@ server <- function(input, output, session) {
             distr_sd <- input$sd/sqrt(N)
             test_stat <- qnorm(1 - input$alpha/two_sided, mean = input$mu0, sd = distr_sd)
             neg_test_stat <- ifelse(input$mu0 != 0, qnorm(input$alpha/two_sided, mean = input$mu0, sd = distr_sd), -test_stat)
-            
+
             # mu0 <= muA
             if(input$mu0 <= input$muA){
                 upr_h0 <- input$mu0 + 3.5*distr_sd
                 lwr_bound <- input$mu0 - 3.5*distr_sd
                 upr_bound <- input$muA + 3.5*distr_sd
                 seq_by <- ifelse(upr_h0 - lwr_bound < 2, 0.001, 0.01)
-                data <- tibble(x_val = seq(from = ifelse(lwr_bound <= 18, 18, lwr_bound),
-                                           to = ifelse(upr_bound >= 62, 62, upr_bound),
+                data <- tibble(x_val = seq(from = lwr_bound,
+                                           to = upr_bound,
                                            by = seq_by),
                                pdf_h0 = dnorm(x_val, mean = input$mu0, sd = distr_sd),
                                pdf_hA = dnorm(x_val, mean = input$muA, sd = distr_sd))
@@ -400,9 +316,10 @@ server <- function(input, output, session) {
             }
         }
     }, height = 555)
-    
+
     #Power curve
     output$pow_curve <- renderPlot({
+        ifelse(as.numeric(input$which_calc) == 1, req(input$mu0, input$muA, input$sd, input$N), req(input$mu0, input$muA, input$sd, input$power))
         power <- -1
         N <- -1
         effect_size <- round(abs(input$mu0 - input$muA)/input$sd, 3)

@@ -1,4 +1,4 @@
-# One-Sample T test app
+# Paired T test app
 # Will Baker-Robinson
 # BSTA 500 -BERD PSS Seminar
 # Simplified Version meant for teaching demos
@@ -53,7 +53,7 @@ two_sided_t <- function(data, test_stat, color)
                  color = "#999999") + 
     labs(x = "T values",
          y = "",
-         title = "Traditional Power Visualization: 1 Sample T-test") +
+         title = "Traditional Power Visualization: Paired T-test") +
     annotate("text", x = 0, y = max(data$pdf_h0) + 0.01, label = glue("H0"), size = text_size) +
     annotate("text", x = data[[which.max(data$pdf_hA),1]], y = max(data$pdf_hA) + 0.01, label = glue("HA"), size = text_size) +
     annotate("text", x = -test_stat, y = max_h0 + 0.01, label = glue("-Tcrit"), size = text_size) +
@@ -97,7 +97,7 @@ one_sided_t <- function(data, test_stat, color)
                  alpha = 0.7,
                  color = "#999999") + 
     labs(x = "T values",
-         title = "Traditional Power Visualization: 1 Sample T-test") +
+         title = "Traditional Power Visualization: Paired T-test") +
     annotate("text", x = 0, y = max(data$pdf_h0) + 0.01, label = glue("H0"), size = text_size) +
     annotate("text", x = data[[which.max(data$pdf_hA),1]], y = max(data$pdf_hA) + 0.01, label = glue("HA"), size = text_size) +
     annotate("text", x = test_stat, y = max_h0 + 0.01, label = glue("Tcrit"), size = text_size) +
@@ -164,7 +164,7 @@ two_sided_z_h0_leq <- function(data, mu0, muA, test_stat, neg_test_stat, color)
                  color = "#999999") + 
     labs(x = "Mean Values",
          y = "",
-         title = "Traditional Power Visualization: 1 Sample Z-test") +
+         title = "Traditional Power Visualization: Paired Z-test") +
     annotate("text", x = mu0, y = label_height - 0.016, label = glue("H0"), size = text_size) +
     annotate("text", x = muA, y = label_height - 0.016, label = glue("HA"), size = text_size) +
     annotate("text", x = neg_test_stat, y = label_height, label = glue("-Critical Value"), size = text_size) +
@@ -172,7 +172,7 @@ two_sided_z_h0_leq <- function(data, mu0, muA, test_stat, neg_test_stat, color)
     theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
     theme(legend.position="bottom") +
-    coord_cartesian(xlim = c(20, 60), ylim = c(0, 0.25))
+    coord_cartesian(xlim = c(-20, 20), ylim = c(0, 0.25))
 }
 
 one_sided_z_h0_leq <- function(data, mu0, muA, test_stat, color)
@@ -212,14 +212,14 @@ one_sided_z_h0_leq <- function(data, mu0, muA, test_stat, color)
                  color = "#999999") + 
     labs(x = "Mean Values",
          y = "",
-         title = "Traditional Power Visualization: 1 Sample Z-test") +
+         title = "Traditional Power Visualization: Paired Z-test") +
     annotate("text", x = mu0, y = label_height - 0.016, label = glue("H0"), size = text_size) +
     annotate("text", x = muA, y = label_height - 0.016, label = glue("HA"), size = text_size) +
     annotate("text", x = test_stat, y = label_height, label = glue("Critical Value"), size = text_size) +
     theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
     theme(legend.position="bottom") +
-    coord_cartesian(xlim = c(20, 60), ylim = c(0, 0.25))
+    coord_cartesian(xlim = c(-20, 20), ylim = c(0, 0.25))
 }
 
 two_sided_z_h0_greater <- function(data, mu0, muA, test_stat, neg_test_stat, color)
@@ -279,7 +279,7 @@ two_sided_z_h0_greater <- function(data, mu0, muA, test_stat, neg_test_stat, col
                  color = "#999999") + 
     labs(x = "Mean Values",
          y = "",
-         title = "Traditional Power Visualization: 1 Sample Z-test") +
+         title = "Traditional Power Visualization: Paired Z-test") +
     annotate("text", x = mu0, y = label_height - 0.016, label = glue("H0"), size = text_size) +
     annotate("text", x = muA, y = label_height - 0.016, label = glue("HA"), size = text_size) +
     annotate("text", x = neg_test_stat, y = label_height, label = glue("-Critical Value"), size = text_size) +
@@ -287,7 +287,7 @@ two_sided_z_h0_greater <- function(data, mu0, muA, test_stat, neg_test_stat, col
     theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
     theme(legend.position="bottom") +
-    coord_cartesian(xlim = c(20, 60), ylim = c(0, 0.25))
+    coord_cartesian(xlim = c(-20, 20), ylim = c(0, 0.25))
 }
 
 one_sided_z_h0_greater <- function(data, mu0, muA, neg_test_stat, color)
@@ -331,17 +331,17 @@ one_sided_z_h0_greater <- function(data, mu0, muA, neg_test_stat, color)
                  color = "#999999") + 
     labs(x = "Mean Values",
          y = "",
-         title = "Traditional Power Visualization: 1 Sample Z-test") +
+         title = "Traditional Power Visualization: Paired Z-test") +
     annotate("text", x = mu0, y = label_height - 0.016, label = glue("H0"), size = text_size) +
     annotate("text", x = muA, y = label_height - 0.016, label = glue("HA"), size = text_size) +
     annotate("text", x = neg_test_stat, y = label_height, label = glue("Critical Value"), size = text_size) +
     theme_bw(base_size = plot_size) +
     scale_fill_manual(name = "Area Represents:", values = color) +
     theme(legend.position="bottom") +
-    coord_cartesian(xlim = c(20, 60), ylim = c(0, 0.25))
+    coord_cartesian(xlim = c(-20, 20), ylim = c(0, 0.25))
 }
 
-# ---------------------------------------- CODE BELOW IS FOR TESTING PURPOSES | Just >= T --------------------------------------------
+# ---------------------------------------- CODE BELOW IS FOR TESTING PURPOSES--------------------------------------------
 # color <- c("Type I Error (alpha)" = "#E69F00",
 #            "Type II Error (Beta)" = "#F0E442",
 #            "Power" = "#0072B2",
