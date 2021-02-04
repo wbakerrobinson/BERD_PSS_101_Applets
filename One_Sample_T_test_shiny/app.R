@@ -371,8 +371,8 @@ server <- function(input, output, session) {
                 lwr_bound <- input$mu0 - 3.5*distr_sd
                 upr_bound <- input$muA + 3.5*distr_sd
                 seq_by <- ifelse(upr_h0 - lwr_bound < 2, 0.001, 0.01)
-                data <- tibble(x_val = seq(from = ifelse(lwr_bound <= 18, 18, lwr_bound),
-                                           to = ifelse(upr_bound >= 62, 62, upr_bound),
+                data <- tibble(x_val = seq(from = lwr_bound,
+                                           to = upr_bound,
                                            by = seq_by),
                                pdf_h0 = dnorm(x_val, mean = input$mu0, sd = distr_sd),
                                pdf_hA = dnorm(x_val, mean = input$muA, sd = distr_sd))
